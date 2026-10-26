@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrativo | Rodamientos RM</title>
+    <!-- Tailwind CSS & Lucide Icons & ApexCharts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --azul-corp: #0C3B7C;
+            --azul-celeste: #00A8E8;
+            --blanco: #FFFFFF;
+            --gris-claro: #E5E7EB;
+            --rojo-acento: #E63946;
+            --gris-oscuro: #1F2937;
+            --bg-main: #F4F6FA;
+            --bg-card: #FFFFFF;
+            --text-main: #1F2937;
+            --border-color: #E5E7EB;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .soft-card {
+            background-color: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .gradient-card-1 { background: linear-gradient(135deg, #0C3B7C 0%, #00A8E8 100%); }
+        .gradient-card-2 { background: linear-gradient(135deg, #00A8E8 0%, #3B82F6 100%); }
+        .gradient-card-3 { background: linear-gradient(135deg, #1F2937 0%, #0C3B7C 100%); }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <!-- Pantalla de Login -->
+    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900" style="display: flex;">
+        <div class="bg-slate-900 border border-sky-900 rounded-2xl p-8 w-full max-w-md shadow-2xl text-center">
+            <img src="https://i.postimg.cc/gJFWTtwg/photo-2026-09-18-11-07-31.jpg" class="w-20 h-20 rounded-full mx-auto mb-4 border-2 border-sky-400 object-cover" alt="Logo">
+            <h2 class="text-white text-xl font-bold mb-6">Panel Administrativo</h2>
+            <div id="login-error" class="mb-4 text-rose-500 text-xs font-semibold"></div>
+            <form id="form-admin-login" onsubmit="handleAdminLogin(event)" class="space-y-4 text-left">
+                <div>
+                    <label class="block mb-2 text-xs text-slate-300 font-bold">Correo Electrónico</label>
+                    <input type="email" id="login-email" required class="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm outline-none focus:border-sky-400" placeholder="admin@rodamientosrm.com">
+                </div>
+                <div>
+                    <label class="block mb-2 text-xs text-slate-300 font-bold">Contraseña</label>
+                    <input type="password" id="login-password" required class="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm outline-none focus:border-sky-400" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-900 to-sky-500 text-white font-bold rounded-xl text-sm shadow active:scale-95 transition">Ingresar al Panel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal -->
+    <div id="app-container" class="min-h-screen flex flex-col md:flex-row" style="display: none;">
+        <!-- Sidebar Navigation -->
+        <aside class="w-full md:w-64 border-r p-6 flex flex-col justify-between bg-white border-gray-200">
+            <div>
+                <div class="flex items-center gap-3 mb-8">
+                    <img src="https://i.postimg.cc/gJFWTtwg/photo-2026-09-18-11-07-31.jpg" class="w-10 h-10 rounded-full border-2 border-sky-400 object-cover" alt="Logo">
+                    <div>
+                        <h3 class="font-bold text-sm text-slate-800">Rodamientos RM</h3>
+                        <p class="text-xs text-slate-400" id="user-role-display">Rol: Administrador</p>
+                    </div>
+                </div>
+
+                <nav class="space-y-2">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-sky-500 bg-sky-50 transition">
+                        <i data-lucide="layout-grid" class="w-4 h-4"></i> Dashboard
+                    </button>
+                    <button onclick="switchTab('inventario')" id="nav-inventario" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition">
+                        <i data-lucide="package" class="w-4 h-4"></i> Inventario
+                    </button>
+                    <button onclick="switchTab('compras')" id="nav-compras" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition">
+                        <i data-lucide="shopping-bag" class="w-4 h-4"></i> Compras / Despacho
+                    </button>
+                    <button onclick="switchTab('clientes')" id="nav-clientes" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition">
+                        <i data-lucide="users" class="w-4 h-4"></i> Clientes
+                    </button>
+                    <button onclick="switchTab('usuarios')" id="nav-usuarios" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition">
+                        <i data-lucide="shield-check" class="w-4 h-4"></i> Gestor de Usuarios
+                    </button>
+                    <button onclick="switchTab('avanzado')" id="nav-avanzado" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition">
+                        <i data-lucide="settings" class="w-4 h-4"></i> Área Avanzada
+                    </button>
+                </nav>
+            </div>
+
+            <div class="pt-6 border-t border-gray-200">
+                <a href="index.html" target="_blank" class="flex items-center gap-2 text-xs font-bold mb-4 text-sky-500 hover:underline">
+                    <i data-lucide="external-link" class="w-4 h-4"></i> Ver Tienda
+                </a>
+                <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-xs text-rose-500 hover:bg-rose-50 transition">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+
+            <!-- Mensajes de Notificación -->
+            <div id="toast-msg" class="hidden mb-6 p-4 rounded-2xl text-sm font-semibold border shadow"></div>
+
+            <!-- TAB 1: DASHBOARD -->
+            <div id="tab-dashboard" class="tab-content active space-y-8">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-800">Dashboard General</h1>
+                        <p class="text-xs text-slate-400">Resumen financiero y control de tasa diaria</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="gradient-card-1 p-6 rounded-3xl text-white shadow-lg">
+                        <span class="text-xs uppercase tracking-wider font-semibold opacity-90">Total Ventas Aprobadas</span>
+                        <div id="dash-total-ventas" class="text-3xl font-extrabold my-2">$0.00 REF</div>
+                    </div>
+
+                    <div class="gradient-card-2 p-6 rounded-3xl text-white shadow-lg">
+                        <span class="text-xs uppercase tracking-wider font-semibold opacity-90">Tasa Diaria (USD / BS)</span>
+                        <div class="mt-2 flex gap-2">
+                            <input type="number" step="0.01" id="input-tasa-global" value="36.50" class="w-full px-3 py-1.5 rounded-xl text-slate-800 text-sm outline-none font-bold">
+                            <button onclick="saveTasaGlobal()" class="bg-white text-blue-800 font-bold px-3 py-1.5 rounded-xl text-xs hover:bg-slate-100 transition">Guardar</button>
+                        </div>
+                    </div>
+
+                    <div class="gradient-card-3 p-6 rounded-3xl text-white shadow-lg">
+                        <span class="text-xs uppercase tracking-wider font-semibold opacity-90">Total Pedidos Globales</span>
+                        <div id="dash-total-pedidos" class="text-3xl font-extrabold my-2">0</div>
+                    </div>
+                </div>
+
+                <!-- Alerta Dashboard: Stock Bajo -->
+                <div class="soft-card p-6 border-rose-200 bg-rose-50/20">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold text-lg text-rose-600 flex items-center gap-2">
+                            ⚠️ Alerta de Stock Bajo (≤ 6 unidades)
+                        </h3>
+                        <span id="dash-low-stock-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-rose-500 text-white">0 productos</span>
+                    </div>
+                    <div id="dash-low-stock-list" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <p class="text-xs text-slate-400 col-span-3">Cargando inventario...</p>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Velas Japonesas -->
+                <div class="soft-card p-6">
+                    <h3 class="font-bold text-lg mb-4 text-slate-800">Gráfico de Rendimiento de Ventas (Velas Japonesas)</h3>
+                    <div id="candlestick-chart"></div>
+                </div>
+            </div>
+
+            <!-- TAB 2: INVENTARIO -->
+            <div id="tab-inventario" class="tab-content space-y-8">
+                <div class="soft-card p-6">
+                    <h3 class="font-bold text-lg mb-4 text-slate-800">Ingresar Nuevo Producto</h3>
+                    <form id="form-add-product" onsubmit="handleAddProduct(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="text-xs font-bold block mb-1 text-slate-600">Nombre del Producto *</label>
+                            <input type="text" id="prod-titulo" required class="w-full p-2.5 rounded-xl text-sm border border-gray-200 outline-none bg-white">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold block mb-1 text-slate-600">N° de Parte *</label>
+                            <input type="text" id="prod-parte" required class="w-full p-2.5 rounded-xl text-sm border border-gray-200 outline-none bg-white">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold block mb-1 text-slate-600">Categoría del Producto *</label>
+                            <select id="prod-categoria" required class="w-full p-2.5 rounded-xl text-sm border border-gray-200 outline-none bg-white">
+                                <option value="Rodamiento">Rodamiento</option>
+                                <option value="Esteperas">Esteperas</option>
+                                <option value="Sellos Mecánicos">Sellos Mecánicos</option>
+                                <option value="Chumaceras">Chumaceras</option>
+                                <option value="Cubos de rueda">Cubos de rueda</option>
+                                <option value="Crucetas">Crucetas</option>
+                                <option value="Soporte de cardan">Soporte de cardan</option>
+                                <option value="Piñones">Piñones</option>
+                                <option value="Otros">Otros</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold block mb-1 text-slate-600">Precio REF ($) *</label>
+                            <input type="number" step="0.01" id="prod-precio" required class="w-full p-2.5 rounded-xl text-sm border border-gray-200 outline-none bg-white">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold block mb-1 text-slate-600">Stock Disponible *</label>
+                            <input type="number" id="prod-stock" required class="w-full p-2.5 rounded-xl text-sm border border-gray-200 outline-none bg-white">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold block mb-1 text-slate-600">Fotografía del Producto *</label>
+                            <input type="file" id="prod-imagen" accept="image/*" required class="w-full p-2 rounded-xl text-xs border border-gray-200 outline-none bg-white">
+                        </div>
+                        <div class="md:col-span-3 flex justify-end">
+                            <button type="submit" id="btn-save-prod" class="bg-sky-500 hover:bg-sky-600 text-white font-bold px-6 py-2.5 rounded-xl text-sm shadow transition">Publicar Producto</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="soft-card p-6">
+                    <h3 class="font-bold text-lg mb-4 text-slate-800">Inventario Actual</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th class="pb-2">Foto</th>
+                                    <th class="pb-2">Producto / N° Parte</th>
+                                    <th class="pb-2">Categoría</th>
+                                    <th class="pb-2">Precio REF</th>
+                                    <th class="pb-2">Stock</th>
+                                    <th class="pb-2">Estado</th>
+                                    <th class="pb-2">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table-body">
+                                <tr><td colspan="7" class="py-4 text-center text-slate-400">Cargando productos...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: PEDIDOS / COMPRAS Y DESPACHO -->
+            <div id="tab-compras" class="tab-content space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Gestión de Compras y Despacho</h2>
+                        <p class="text-xs text-slate-400">Visualiza comprobantes, detalles de clientes y actualiza el estatus del envío</p>
+                    </div>
+                </div>
+                <div id="orders-container" class="space-y-6">
+                    <div class="soft-card p-8 text-center text-slate-400 text-sm">Cargando pedidos de clientes...</div>
+                </div>
+            </div>
+
+            <!-- TAB 4: CLIENTES -->
+            <div id="tab-clientes" class="tab-content space-y-6">
+                <div class="soft-card p-6">
+                    <h3 class="font-bold text-lg mb-4 text-slate-800">Base de Datos de Clientes</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead>
+                                <tr class="border-b border-gray-200 bg-slate-50">
+                                    <th class="p-3 font-bold">Nombre / Cédula</th>
+                                    <th class="p-3 font-bold">Correo Electrónico</th>
+                                    <th class="p-3 font-bold">Teléfono / WhatsApp</th>
+                                    <th class="p-3 font-bold">Dirección Registrada</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clients-table-body">
+                                <tr><td colspan="4" class="p-3 text-center text-slate-400">Sin clientes registrados aún.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: USUARIOS -->
+            <div id="tab-usuarios" class="tab-content space-y-8">
+                <div class="soft-card p-6 max-w-xl">
+                    <h3 class="font-bold text-lg mb-4 text-slate-800">Crear Usuario Administrador o Empleado</h3>
+                    <form onsubmit="handleCreateUser(event)" class="space-y-4">
+                        <div>
+                            <label class="text-xs font-bold block mb-1 text-slate-600">Correo Electrónico *</label>
+                            <input type="email" id="new-user-email" required class="w-full p-2.5 rounded-xl text-sm border border-gray-200 outline-none bg-white">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold block mb-1 text-slate-600">Contraseña *</label>
+                            <input type="password" id="new-user-pass" required class="w-full p-2.5 rounded-xl text-sm border border-gray-200 outline-none bg-white">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold block mb-1 text-slate-600">Rol *</label>
+                            <select id="new-user-role" class="w-full p-2.5 rounded-xl text-sm border border-gray-200 outline-none bg-white">
+                                <option value="admin">Administrador</option>
+                                <option value="vendedor">Vendedor</option>
+                                <option value="despacho">Despacho</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-2.5 rounded-xl text-sm shadow">Crear Usuario</button>
+                    </form>
+                </div>
+
+                <div class="soft-card p-6">
+                    <h3 class="font-bold text-lg mb-4 text-slate-800">Usuarios Registrados</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead>
+                                <tr class="border-b border-gray-200 bg-slate-50">
+                                    <th class="p-3 font-bold">Correo Electrónico</th>
+                                    <th class="p-3 font-bold">Rol</th>
+                                    <th class="p-3 font-bold">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                <tr><td colspan="3" class="p-3 text-center text-slate-400">Cargando usuarios...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 6: AVANZADO -->
+            <div id="tab-avanzado" class="tab-content space-y-6">
+                <div class="soft-card p-6 border-rose-200 bg-rose-50/30 max-w-xl">
+                    <h3 class="font-bold text-lg mb-2 text-rose-600">Zona de Peligro / Limpiar Base de Datos</h3>
+                    <p class="text-xs text-slate-600 mb-4">Esta acción eliminará todos los productos y órdenes de prueba para dejar el sistema limpio para su entrega final.</p>
+                    <button onclick="handleCleanDatabase()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-xl text-sm shadow transition">Limpiar Base de Datos (Resetear)</button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Firebase SDK Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD3vPGQuQosfgpDqPQOipFS0ArTcz_Jl94",
+            authDomain: "rodamientosrm.firebaseapp.com",
+            projectId: "rodamientosrm",
+            storageBucket: "rodamientosrm.firebasestorage.app",
+            messagingSenderId: "958419429584",
+            appId: "1:958419429584:web:05183fdd8d9301560096d5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast-msg');
+            toast.innerText = msg;
+            toast.className = `mb-6 p-4 rounded-2xl text-sm font-semibold border shadow ${isError ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 4000);
+        }
+
+        // Tasa Global
+        window.saveTasaGlobal = async function() {
+            const tasaVal = parseFloat(document.getElementById('input-tasa-global').value);
+            if (!tasaVal || tasaVal <= 0) return alert("Ingrese un valor de tasa válido.");
+            try {
+                await setDoc(doc(db, "settings", "tasa_usd"), { value: tasaVal });
+                showToast("¡Tasa del día actualizada correctamente a " + tasaVal + " Bs!");
+            } catch (e) { showToast("Error: " + e.message, true); }
+        };
+
+        function listenTasaGlobal() {
+            onSnapshot(doc(db, "settings", "tasa_usd"), (docSnap) => {
+                if (docSnap.exists()) {
+                    document.getElementById('input-tasa-global').value = docSnap.data().value;
+                }
+            });
+        }
+
+        // Compresión de imagen de producto
+        function compressImage(file, maxWidth = 400, quality = 0.7) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                };
+            });
+        }
+
+        window.handleAddProduct = async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save-prod');
+            btn.disabled = true;
+            btn.innerText = "Guardando...";
+
+            try {
+                const titulo = document.getElementById('prod-titulo').value;
+                const parte = document.getElementById('prod-parte').value;
+                const categoria = document.getElementById('prod-categoria').value;
+                const precio = parseFloat(document.getElementById('prod-precio').value);
+                const stock = parseInt(document.getElementById('prod-stock').value);
+                const fileInput = document.getElementById('prod-imagen').files[0];
+
+                let photoUrl = "https://i.postimg.cc/gJFWTtwg/photo-2026-09-18-11-07-31.jpg";
+                if (fileInput) { photoUrl = await compressImage(fileInput); }
+
+                await addDoc(collection(db, "products"), {
+                    titulo, numero_parte: parte, categoria, precio_ref: precio, stock, active: true, imagen: photoUrl, created_at: new Date()
+                });
+
+                showToast("¡Producto publicado en el catálogo con éxito!");
+                document.getElementById('form-add-product').reset();
+            } catch (err) {
+                showToast("Error al guardar producto: " + err.message, true);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Publicar Producto";
+            }
+        };
+
+        // Cargar Inventario y Alertas Dashboard
+        window.loadInventory = function() {
+            const tbody = document.getElementById('inventory-table-body');
+            const dashList = document.getElementById('dash-low-stock-list');
+            const dashBadge = document.getElementById('dash-low-stock-badge');
+            const totalVentasEl = document.getElementById('dash-total-ventas');
+            const totalPedidosEl = document.getElementById('dash-total-pedidos');
+
+            onSnapshot(collection(db, "products"), (querySnapshot) => {
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-slate-400">No hay productos.</td></tr>';
+                    dashList.innerHTML = '<p class="text-xs text-slate-400 col-span-3">No hay productos.</p>';
+                    dashBadge.innerText = '0 productos';
+                    return;
+                }
+
+                let html = '';
+                let lowStockHtml = '';
+                let lowStockCount = 0;
+
+                querySnapshot.forEach((docSnap) => {
+                    const p = docSnap.data();
+                    const id = docSnap.id;
+                    const isLowStock = p.stock <= 6;
+                    const isActive = p.active !== false;
+
+                    if (isLowStock) {
+                        lowStockCount++;
+                        lowStockHtml += `
+                            <div class="p-3 bg-white border border-rose-200 rounded-xl flex items-center justify-between shadow-sm">
+                                <div class="flex items-center gap-3">
+                                    <img src="${p.imagen}" class="w-8 h-8 rounded-lg object-cover">
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-800">${p.titulo}</p>
+                                        <p class="text-[10px] text-slate-400">N° ${p.numero_parte}</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-black text-rose-500 bg-rose-100 px-2 py-1 rounded-lg">${p.stock} uds</span>
+                            </div>
+                        `;
+                    }
+
+                    html += `
+                        <tr class="border-b border-gray-100 hover:bg-slate-50 ${!isActive ? 'opacity-60 bg-slate-50' : ''}">
+                            <td class="py-3"><img src="${p.imagen}" class="w-10 h-10 rounded-lg object-cover"></td>
+                            <td class="py-3 font-bold">${p.titulo}<br><span class="text-xs font-normal text-slate-400">N° ${p.numero_parte}</span></td>
+                            <td class="py-3 text-xs">${p.categoria}</td>
+                            <td class="py-3">
+                                <div class="flex items-center gap-1">
+                                    <span class="text-xs font-bold">$</span>
+                                    <input type="number" step="0.01" value="${p.precio_ref}" id="price-${id}" class="w-16 p-1 border rounded text-xs font-bold">
+                                </div>
+                            </td>
+                            <td class="py-3">
+                                <div class="flex items-center gap-1">
+                                    <input type="number" value="${p.stock}" id="stock-${id}" class="w-14 p-1 border rounded text-xs font-bold ${isLowStock ? 'text-rose-600 font-extrabold border-rose-300' : ''}">
+                                    <button onclick="updateStockAndPrice('${id}')" class="px-2 py-1 bg-sky-500 text-white rounded text-[10px] font-bold">Guardar</button>
+                                </div>
+                            </td>
+                            <td class="py-3">
+                                ${isActive ? (isLowStock ? '<span class="px-2 py-1 rounded-full text-[10px] font-bold bg-rose-100 text-rose-600 border border-rose-200">⚠️ Stock Bajo</span>' : '<span class="px-2 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-600 border border-emerald-200">🟢 Activo</span>') : '<span class="px-2 py-1 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600 border border-slate-300">⏸️ Pausado</span>'}
+                            </td>
+                            <td class="py-3">
+                                <div class="flex items-center gap-2">
+                                    <button onclick="toggleProductState('${id}', ${isActive})" class="px-2.5 py-1 rounded-lg text-xs font-bold ${isActive ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}">
+                                        ${isActive ? 'Apagar' : 'Encender'}
+                                    </button>
+                                    <button onclick="deleteProduct('${id}')" class="text-xs font-bold text-rose-500 hover:underline">Eliminar</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                tbody.innerHTML = html;
+                dashBadge.innerText = `${lowStockCount} producto(s)`;
+                dashList.innerHTML = lowStockCount > 0 ? lowStockHtml : '<p class="text-xs text-emerald-600 font-semibold col-span-3">🎉 ¡Excelente! No hay productos con stock bajo.</p>';
+            });
+        };
+
+        // CARGAR PEDIDOS / COMPRAS Y DESPACHO EN TIEMPO REAL
+        window.loadOrders = function() {
+            const container = document.getElementById('orders-container');
+            const totalPedidosEl = document.getElementById('dash-total-pedidos');
+            const totalVentasEl = document.getElementById('dash-total-ventas');
+
+            onSnapshot(collection(db, "orders"), (snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = '<div class="soft-card p-8 text-center text-slate-400 text-sm">No hay pedidos registrados en la tienda.</div>';
+                    totalPedidosEl.innerText = "0";
+                    totalVentasEl.innerText = "$0.00 REF";
+                    return;
+                }
+
+                let html = '';
+                let totalOrders = 0;
+                let totalVentas = 0;
+
+                snapshot.forEach(docSnap => {
+                    const order = docSnap.data();
+                    const orderId = docSnap.id;
+                    totalOrders++;
+                    totalVentas += order.total_ref || 0;
+
+                    const statusColors = {
+                        "En Proceso": "bg-amber-100 text-amber-700 border-amber-200",
+                        "Enviado": "bg-sky-100 text-sky-700 border-sky-200",
+                        "Entregado": "bg-emerald-100 text-emerald-700 border-emerald-200",
+                        "Listo para Recogida en Tienda": "bg-purple-100 text-purple-700 border-purple-200"
+                    };
+
+                    html += `
+                        <div class="soft-card p-6 space-y-4">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-4">
+                                <div>
+                                    <span class="text-[10px] font-bold text-slate-400">TRACKING: ${order.tracking}</span>
+                                    <h3 class="text-base font-extrabold text-blue-900">${order.cliente} (C.I: ${order.cedula})</h3>
+                                    <p class="text-xs text-slate-500">Correo: ${order.correo} | Tel: ${order.telefono} / Sec: ${order.telefono_secundario}</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <select onchange="updateOrderStatus('${orderId}', this.value)" class="p-2 rounded-xl text-xs font-bold border outline-none ${statusColors[order.estatus] || 'bg-slate-100'}">
+                                        <option value="En Proceso" ${order.estatus === 'En Proceso' ? 'selected' : ''}>En Proceso</option>
+                                        <option value="Enviado" ${order.estatus === 'Enviado' ? 'selected' : ''}>Enviado (ZOOM)</option>
+                                        <option value="Listo para Recogida en Tienda" ${order.estatus === 'Listo para Recogida en Tienda' ? 'selected' : ''}>Listo para Recogida</option>
+                                        <option value="Entregado" ${order.estatus === 'Entregado' ? 'selected' : ''}>Entregado</option>
+                                    </select>
+                                    <button onclick="deleteOrder('${orderId}')" class="text-xs font-bold text-rose-500 hover:underline">Eliminar</button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-slate-50 p-4 rounded-xl">
+                                <div>
+                                    <p class="font-bold text-slate-700">Tipo de Entrega:</p>
+                                    <p class="text-slate-600">${order.tipo_entrega}</p>
+                                    <p class="text-slate-500">📍 ${order.direccion}</p>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-700">Método de Pago:</p>
+                                    <p class="text-slate-600">${order.metodo_pago}</p>
+                                    <p class="text-sky-600 font-extrabold text-sm">$${order.total_ref.toFixed(2)} REF (${order.total_bs.toLocaleString('es-VE')} Bs)</p>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-700 mb-1">Comprobante de Pago:</p>
+                                    ${order.comprobante ? `<a href="${order.comprobante}" target="_blank" class="inline-block"><img src="${order.comprobante}" class="h-16 w-16 object-cover rounded-lg border shadow hover:scale-105 transition"></a>` : '<span class="text-slate-400">Sin comprobante</span>'}
+                                </div>
+                            </div>
+
+                            <div>
+                                <p class="text-xs font-bold text-slate-700 mb-2">Productos Solicitados:</p>
+                                <div class="flex flex-wrap gap-2">
+                                    ${order.productos.map(p => `
+                                        <span class="px-3 py-1 bg-sky-50 border border-sky-100 rounded-lg text-xs font-semibold text-sky-900">
+                                            ${p.titulo} (x${p.qty}) - $${(p.precio * p.qty).toFixed(2)}
+                                        </span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+                totalPedidosEl.innerText = totalOrders;
+                totalVentasEl.innerText = `$${totalVentas.toFixed(2)} REF`;
+            });
+        };
+
+        window.updateOrderStatus = async function(orderId, newStatus) {
+            try {
+                await updateDoc(doc(db, "orders", orderId), { estatus: newStatus });
+                showToast("¡Estatus del pedido actualizado con éxito!");
+            } catch (e) {
+                showToast("Error al actualizar estatus: " + e.message, true);
+            }
+        };
+
+        window.deleteOrder = async function(orderId) {
+            if (!confirm("¿Desea eliminar este pedido del historial?")) return;
+            try {
+                await deleteDoc(doc(db, "orders", orderId));
+                showToast("Pedido eliminado.");
+            } catch (e) { showToast("Error: " + e.message, true); }
+        };
+
+        window.updateStockAndPrice = async function(id) {
+            const newStock = parseInt(document.getElementById(`stock-${id}`).value);
+            const newPrice = parseFloat(document.getElementById(`price-${id}`).value);
+            try {
+                await updateDoc(doc(db, "products", id), { stock: newStock, precio_ref: newPrice });
+                showToast("¡Stock y precio actualizados!");
+            } catch (e) { showToast("Error: " + e.message, true); }
+        };
+
+        window.toggleProductState = async function(id, currentState) {
+            try {
+                await updateDoc(doc(db, "products", id), { active: !currentState });
+                showToast(currentState ? "Producto pausado." : "Producto activado.");
+            } catch (e) { showToast("Error: " + e.message, true); }
+        };
+
+        window.deleteProduct = async function(id) {
+            if (!confirm("¿Desea eliminar este producto?")) return;
+            try { await deleteDoc(doc(db, "products", id)); showToast("Eliminado."); } catch (e) { showToast("Error", true); }
+        };
+
+        // Crear Usuarios
+        window.handleCreateUser = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('new-user-email').value;
+            const pass = document.getElementById('new-user-pass').value;
+            const role = document.getElementById('new-user-role').value;
+            try {
+                const userCred = await createUserWithEmailAndPassword(auth, email, pass);
+                await setDoc(doc(db, "users", userCred.user.uid), { email, role, created_at: new Date() });
+                showToast(`Usuario ${email} creado con éxito.`);
+                document.getElementById('new-user-email').value = '';
+                document.getElementById('new-user-pass').value = '';
+            } catch (e) { showToast("Error: " + e.message, true); }
+        };
+
+        function loadUsersList() {
+            const tbody = document.getElementById('users-table-body');
+            onSnapshot(collection(db, "users"), (querySnapshot) => {
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-slate-400">Sin usuarios.</td></tr>';
+                    return;
+                }
+                let html = '';
+                querySnapshot.forEach((docSnap) => {
+                    const u = docSnap.data();
+                    const uid = docSnap.id;
+                    html += `
+                        <tr class="border-b border-gray-100 hover:bg-slate-50">
+                            <td class="p-3 font-bold text-slate-800">${u.email}</td>
+                            <td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-700 uppercase">${u.role}</span></td>
+                            <td class="p-3"><button onclick="deleteUserDoc('${uid}')" class="text-xs font-bold text-rose-500 hover:underline">Eliminar</button></td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+            });
+        }
+
+        window.deleteUserDoc = async function(uid) {
+            if (!confirm("¿Eliminar usuario?")) return;
+            try { await deleteDoc(doc(db, "users", uid)); showToast("Eliminado."); } catch(e) { showToast("Error", true); }
+        };
+
+        // Clientes
+        function loadClientsList() {
+            const tbody = document.getElementById('clients-table-body');
+            onSnapshot(collection(db, "clients"), (snapshot) => {
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-400">Sin clientes registrados.</td></tr>';
+                    return;
+                }
+                let html = '';
+                snapshot.forEach(docSnap => {
+                    const c = docSnap.data();
+                    html += `
+                        <tr class="border-b border-gray-100 hover:bg-slate-50">
+                            <td class="p-3 font-bold text-slate-800">${c.nombre || 'N/A'}<br><span class="text-[10px] text-slate-400">C.I: ${c.cedula || 'N/A'}</span></td>
+                            <td class="p-3 text-xs">${c.correo}</td>
+                            <td class="p-3 text-xs font-bold text-sky-600">${c.telefono || 'N/A'}</td>
+                            <td class="p-3 text-xs text-slate-500">${c.direccion || 'N/A'}</td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+            });
+        }
+
+        window.handleCleanDatabase = async function() {
+            if (!confirm("¿Borrar todos los productos?")) return;
+            try {
+                const querySnapshot = await getDocs(collection(db, "products"));
+                querySnapshot.forEach(async (d) => { await deleteDoc(doc(db, "products", d.id)); });
+                showToast("Base de datos de productos limpia.");
+            } catch (e) { showToast("Error", true); }
+        };
+
+        window.handleAdminLogin = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
+            const errorDiv = document.getElementById('login-error');
+            try {
+                errorDiv.innerText = "";
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (err) {
+                errorDiv.innerText = "Error: Usuario o contraseña inválidos.";
+            }
+        };
+
+        window.handleLogout = function() { signOut(auth).then(() => window.location.reload()); };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('app-container').style.display = 'none';
+            } else {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-container').style.display = 'flex';
+                listenTasaGlobal();
+                loadInventory();
+                loadOrders();
+                loadClientsList();
+                loadUsersList();
+            }
+        });
+    </script>
+
+    <script>
+        lucide.createIcons();
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            document.querySelectorAll('aside nav button').forEach(btn => {
+                btn.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition";
+            });
+            document.getElementById('nav-' + tabId).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-sky-500 bg-sky-50 transition";
+        }
+
+        var optionsCandle = {
+            series: [{ data: [
+                { x: new Date(2026, 8, 20), y: [50, 70, 45, 65] },
+                { x: new Date(2026, 8, 21), y: [65, 80, 60, 75] },
+                { x: new Date(2026, 8, 22), y: [75, 90, 70, 85] },
+                { x: new Date(2026, 8, 23), y: [85, 95, 75, 90] }
+            ]}],
+            chart: { type: 'candlestick', height: 320, toolbar: { show: false } },
+            title: { text: 'Fluctuación de Ventas Diarias (REF)', align: 'left' },
+            xaxis: { type: 'datetime' }
+        };
+        var candleChart = new ApexCharts(document.querySelector("#candlestick-chart"), optionsCandle);
+        candleChart.render();
+    </script>
+</body>
+</html>

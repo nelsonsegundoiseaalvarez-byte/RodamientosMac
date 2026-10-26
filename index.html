@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rodamientos RM | Catálogo y Repuestos Industriales</title>
+    <!-- Tailwind CSS & Lucide Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --azul-corp: #0C3B7C;
+            --azul-celeste: #00A8E8;
+            --bg-main: #F4F6FA;
+            --bg-card: #FFFFFF;
+            --text-main: #1F2937;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .soft-card {
+            background-color: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .gradient-header {
+            background: linear-gradient(135deg, #0C3B7C 0%, #00A8E8 100%);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Header / Navbar -->
+    <header class="gradient-header text-white sticky top-0 z-40 shadow-md">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <img src="https://i.postimg.cc/gJFWTtwg/photo-2026-09-18-11-07-31.jpg" class="w-12 h-12 rounded-full border-2 border-white object-cover shadow" alt="Logo">
+                <div>
+                    <h1 class="font-extrabold text-lg tracking-tight">Rodamientos RM</h1>
+                    <p class="text-xs text-sky-100 opacity-90">Especialistas en Rodamientos y Repuestos Industriales</p>
+                </div>
+            </div>
+
+            <!-- Buscador y Tasa del Día -->
+            <div class="flex items-center gap-4 w-full md:w-auto">
+                <input type="text" id="input-search" oninput="filterProducts()" placeholder="Buscar por nombre o N° parte..." class="px-4 py-2 rounded-xl text-xs text-slate-800 bg-white/90 outline-none w-full md:w-64">
+                
+                <div class="bg-white/10 border border-white/20 px-4 py-2 rounded-xl text-xs flex items-center gap-2 whitespace-nowrap">
+                    <span>Tasa BCV:</span>
+                    <strong id="display-tasa">36.50</strong> Bs/$
+                </div>
+
+                <a href="myaccount.html" class="bg-white/20 hover:bg-white/30 text-white p-2.5 rounded-xl font-bold text-xs flex items-center gap-1">
+                    <i data-lucide="user" class="w-4 h-4"></i> Mi Cuenta
+                </a>
+
+                <button onclick="toggleCartModal()" class="relative bg-white text-blue-900 p-2.5 rounded-xl font-bold shadow flex items-center gap-2 text-xs">
+                    <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+                    <span id="cart-counter" class="bg-rose-500 text-white rounded-full px-1.5 py-0.5 text-[10px]">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="flex-1 max-w-7xl mx-auto px-6 py-10 w-full space-y-8">
+
+        <!-- Categorías -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-2" id="category-filters">
+            <button onclick="filterByCategory('Todos')" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold bg-sky-500 text-white shadow transition whitespace-nowrap">Todos</button>
+            <button onclick="filterByCategory('Rodamiento')" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border hover:bg-slate-50 transition whitespace-nowrap">Rodamiento</button>
+            <button onclick="filterByCategory('Esteperas')" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border hover:bg-slate-50 transition whitespace-nowrap">Esteperas</button>
+            <button onclick="filterByCategory('Sellos Mecánicos')" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border hover:bg-slate-50 transition whitespace-nowrap">Sellos Mecánicos</button>
+            <button onclick="filterByCategory('Chumaceras')" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border hover:bg-slate-50 transition whitespace-nowrap">Chumaceras</button>
+            <button onclick="filterByCategory('Cubos de rueda')" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border hover:bg-slate-50 transition whitespace-nowrap">Cubos de rueda</button>
+            <button onclick="filterByCategory('Crucetas')" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border hover:bg-slate-50 transition whitespace-nowrap">Crucetas</button>
+            <button onclick="filterByCategory('Otros')" class="cat-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border hover:bg-slate-50 transition whitespace-nowrap">Otros</button>
+        </div>
+
+        <!-- Grid de Productos -->
+        <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div class="col-span-full text-center py-12 text-slate-400 text-sm">Cargando catálogo de productos...</div>
+        </div>
+
+    </main>
+
+    <!-- Botón Flotante de WhatsApp -->
+    <a href="https://wa.me/584242956993?text=Hola,%20quisiera%20más%20información%20sobre%20sus%20productos." target="_blank" class="fixed bottom-6 right-6 z-50 bg-emerald-500 hover:bg-emerald-600 text-white p-4 rounded-full shadow-2xl flex items-center justify-center transition hover:scale-110">
+        <i data-lucide="message-circle" class="w-7 h-7"></i>
+    </a>
+
+    <!-- Banner Aceptación de Cookies -->
+    <div id="cookie-banner" class="fixed bottom-0 inset-x-0 z-50 bg-slate-900/95 text-white p-6 shadow-2xl border-t border-slate-700 flex flex-col md:flex-row items-center justify-between gap-4" style="display: none;">
+        <div class="text-xs text-slate-300 max-w-3xl">
+            <p class="font-bold text-sm text-white mb-1">🍪 Uso de Cookies y Política de Privacidad</p>
+            Utilizamos cookies propias para mejorar tu experiencia de navegación, recordar los productos agregados a tu carrito y analizar el recorrido en nuestra tienda. Al hacer clic en "Aceptar Todo", consientes nuestra política de privacidad y tratamiento de datos.
+        </div>
+        <div class="flex gap-3">
+            <button onclick="acceptCookies()" class="bg-sky-500 hover:bg-sky-600 text-white px-6 py-2.5 rounded-xl font-bold text-xs shadow transition">Aceptar Todo</button>
+        </div>
+    </div>
+
+    <!-- Modal del Carrito -->
+    <div id="cart-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex justify-end" style="display: none;">
+        <div class="bg-white w-full max-w-md h-full p-6 flex flex-col justify-between shadow-2xl">
+            <div>
+                <div class="flex items-center justify-between pb-4 border-b">
+                    <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                        <i data-lucide="shopping-bag" class="w-5 h-5 text-sky-500"></i> Tu Carrito
+                    </h3>
+                    <button onclick="toggleCartModal()" class="p-2 text-slate-400 hover:text-slate-600">✕</button>
+                </div>
+                <div id="cart-items-container" class="divide-y overflow-y-auto max-h-[60vh] my-4 space-y-3">
+                    <p class="text-xs text-slate-400 text-center py-6">El carrito está vacío</p>
+                </div>
+            </div>
+
+            <div class="border-t pt-4 space-y-4">
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-slate-500 font-semibold">Total en REF ($):</span>
+                    <strong id="cart-total-usd" class="text-lg text-sky-600 font-extrabold">$0.00</strong>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-slate-500 font-semibold">Total Estimado (Bs):</span>
+                    <strong id="cart-total-bs" class="text-sm text-slate-700 font-bold">0.00 Bs</strong>
+                </div>
+                <button onclick="proceedToCheckout()" class="w-full py-3 bg-gradient-to-r from-blue-900 to-sky-500 text-white font-bold rounded-xl text-sm shadow active:scale-95 transition">
+                    Procesar Pedido / Finalizar Compra
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-slate-900 text-white text-center py-6 text-xs mt-auto">
+        <p>© 2026 Rodamientos RM. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Firebase SDK Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD3vPGQuQosfgpDqPQOipFS0ArTcz_Jl94",
+            authDomain: "rodamientosrm.firebaseapp.com",
+            projectId: "rodamientosrm",
+            storageBucket: "rodamientosrm.firebasestorage.app",
+            messagingSenderId: "958419429584",
+            appId: "1:958419429584:web:05183fdd8d9301560096d5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let allProducts = [];
+        let currentTasa = 36.50;
+        let cart = JSON.parse(localStorage.getItem('rm_cart')) || [];
+        let activeCategory = 'Todos';
+
+        // Captación de Cookies & Tracking de Recorrido
+        window.onload = function() {
+            if (!localStorage.getItem('rm_cookies_accepted')) {
+                document.getElementById('cookie-banner').style.display = 'flex';
+            }
+            trackUserJourney('Visita Página Principal');
+        };
+
+        window.acceptCookies = function() {
+            localStorage.setItem('rm_cookies_accepted', 'true');
+            document.getElementById('cookie-banner').style.display = 'none';
+        };
+
+        function trackUserJourney(action) {
+            let journey = JSON.parse(localStorage.getItem('rm_user_journey')) || [];
+            journey.push({ action, time: new Date().toLocaleString() });
+            localStorage.setItem('rm_user_journey', JSON.stringify(journey));
+        }
+
+        onSnapshot(doc(db, "settings", "tasa_usd"), (docSnap) => {
+            if (docSnap.exists()) {
+                currentTasa = docSnap.data().value;
+                document.getElementById('display-tasa').innerText = currentTasa.toFixed(2);
+                renderProducts(allProducts);
+                updateCartUI();
+            }
+        });
+
+        onSnapshot(collection(db, "products"), (querySnapshot) => {
+            allProducts = [];
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                if (data.active !== false && data.stock > 0) {
+                    allProducts.push({ id: docSnap.id, ...data });
+                }
+            });
+            renderProducts(allProducts);
+            updateCartUI();
+        });
+
+        window.renderProducts = function(products) {
+            const grid = document.getElementById('products-grid');
+            const searchVal = document.getElementById('input-search').value.toLowerCase();
+
+            const filtered = products.filter(p => {
+                const matchesCat = activeCategory === 'Todos' || p.categoria === activeCategory;
+                const matchesSearch = p.titulo.toLowerCase().includes(searchVal) || p.numero_parte.toLowerCase().includes(searchVal);
+                return matchesCat && matchesSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-12 text-slate-400 text-sm">No se encontraron productos disponibles.</div>';
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(p => {
+                const priceBs = (p.precio_ref * currentTasa).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                html += `
+                    <div class="soft-card p-4 flex flex-col justify-between hover:shadow-xl transition group">
+                        <div>
+                            <div class="relative overflow-hidden rounded-xl mb-4 bg-slate-100 aspect-square">
+                                <img src="${p.imagen}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="${p.titulo}">
+                                <span class="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-sm text-white px-2.5 py-1 rounded-lg text-[10px] font-bold">${p.categoria}</span>
+                            </div>
+                            <span class="text-[10px] font-bold text-sky-600 uppercase tracking-wider">N° Parte: ${p.numero_parte}</span>
+                            <h3 class="font-bold text-sm text-slate-800 mt-1 mb-2 line-clamp-2">${p.titulo}</h3>
+                        </div>
+                        <div>
+                            <div class="mb-3">
+                                <div class="text-lg font-extrabold text-blue-900">$${parseFloat(p.precio_ref).toFixed(2)} <span class="text-xs font-normal text-slate-400">REF</span></div>
+                                <div class="text-xs text-slate-500 font-semibold">${priceBs} Bs</div>
+                            </div>
+                            <button onclick="addToCart('${p.id}', '${p.titulo}', ${p.precio_ref}, '${p.imagen}')" class="w-full py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-xs shadow transition active:scale-95 flex items-center justify-center gap-2">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Agregar al Carrito
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+            lucide.createIcons();
+        };
+
+        window.filterByCategory = function(cat) {
+            activeCategory = cat;
+            trackUserJourney(`Filtro por categoría: ${cat}`);
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.className = "cat-btn px-4 py-2 rounded-xl text-xs font-bold bg-white text-slate-600 border hover:bg-slate-50 transition whitespace-nowrap";
+                if (btn.innerText === cat) {
+                    btn.className = "cat-btn px-4 py-2 rounded-xl text-xs font-bold bg-sky-500 text-white shadow transition whitespace-nowrap";
+                }
+            });
+            renderProducts(allProducts);
+        };
+
+        window.filterProducts = function() { renderProducts(allProducts); };
+
+        window.addToCart = function(id, titulo, precio, imagen) {
+            const existing = cart.find(item => item.id === id);
+            if (existing) { existing.qty++; } else { cart.push({ id, titulo, precio, imagen, qty: 1 }); }
+            trackUserJourney(`Añadió al carrito: ${titulo}`);
+            saveCart();
+            updateCartUI();
+        };
+
+        function saveCart() {
+            localStorage.setItem('rm_cart', JSON.stringify(cart));
+            localStorage.setItem('rm_tasa', currentTasa);
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items-container');
+            const counter = document.getElementById('cart-counter');
+            const totalUsdEl = document.getElementById('cart-total-usd');
+            const totalBsEl = document.getElementById('cart-total-bs');
+
+            const totalCount = cart.reduce((sum, i) => sum + i.qty, 0);
+            counter.innerText = totalCount;
+
+            if (cart.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-400 text-center py-6">El carrito está vacío</p>';
+                totalUsdEl.innerText = "$0.00";
+                totalBsEl.innerText = "0.00 Bs";
+                return;
+            }
+
+            let html = '';
+            let totalUsd = 0;
+
+            cart.forEach((item, index) => {
+                totalUsd += item.precio * item.qty;
+                html += `
+                    <div class="py-3 flex items-center justify-between gap-3">
+                        <img src="${item.imagen}" class="w-12 h-12 rounded-lg object-cover">
+                        <div class="flex-1">
+                            <h4 class="text-xs font-bold text-slate-800 line-clamp-1">${item.titulo}</h4>
+                            <p class="text-xs text-sky-600 font-bold">$${item.precio.toFixed(2)} x ${item.qty}</p>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="changeQty(${index}, -1)" class="w-6 h-6 bg-slate-100 rounded font-bold text-xs">-</button>
+                            <span class="text-xs font-bold px-2">${item.qty}</span>
+                            <button onclick="changeQty(${index}, 1)" class="w-6 h-6 bg-slate-100 rounded font-bold text-xs">+</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+            totalUsdEl.innerText = `$${totalUsd.toFixed(2)}`;
+            totalBsEl.innerText = `${(totalUsd * currentTasa).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Bs`;
+        }
+
+        window.changeQty = function(index, delta) {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) { cart.splice(index, 1); }
+            saveCart();
+            updateCartUI();
+        };
+
+        window.toggleCartModal = function() {
+            const modal = document.getElementById('cart-modal');
+            modal.style.display = modal.style.display === 'none' ? 'flex' : 'none';
+        };
+
+        window.proceedToCheckout = function() {
+            if (cart.length === 0) return alert("El carrito está vacío.");
+            saveCart();
+            window.location.href = 'cart.html';
+        };
+    </script>
+</body>
+</html>
