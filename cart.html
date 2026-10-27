@@ -28,7 +28,7 @@
 
     <main class="flex-1 max-w-6xl mx-auto px-6 py-10 w-full grid grid-cols-1 md:grid-cols-2 gap-8">
         
-        <!-- Vista Previa de Productos (Siempre Visible) -->
+        <!-- Vista Previa de Productos -->
         <div class="space-y-6">
             <div class="soft-card p-6 space-y-4">
                 <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
@@ -54,15 +54,15 @@
             </div>
         </div>
 
-        <!-- Formulario Autenticación / Checkout -->
+        <!-- Formulario Checkout -->
         <div class="space-y-6">
             
-            <!-- PASO 1: Iniciar Sesión o Registrarse -->
+            <!-- PASO 1: Iniciar Sesión -->
             <div id="step-auth" class="soft-card p-6 space-y-4">
                 <h2 class="font-bold text-lg text-slate-800 flex items-center gap-2">
                     <i data-lucide="lock" class="w-5 h-5 text-sky-500"></i> Inicia Sesión para Continuar
                 </h2>
-                <p class="text-xs text-slate-500">Para poder realizar tu compra y hacer seguimiento al pedido debes registrarte o iniciar sesión.</p>
+                <p class="text-xs text-slate-500">Para realizar tu compra y hacer seguimiento al pedido debes registrarte o iniciar sesión.</p>
 
                 <button onclick="loginGoogle()" class="w-full py-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold rounded-xl text-xs shadow flex items-center justify-center gap-2 transition">
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-4 h-4" alt="Google"> Continuar con Google
@@ -81,7 +81,7 @@
                 </form>
             </div>
 
-            <!-- PASO 2: Datos de Envío y Pago (Se activa al estar autenticado) -->
+            <!-- PASO 2: Datos del Cliente -->
             <div id="step-checkout" class="soft-card p-6 space-y-4" style="display: none;">
                 <div class="flex items-center justify-between border-b pb-3">
                     <span id="user-display-email" class="text-xs font-bold text-sky-600">Sesión iniciada</span>
@@ -90,25 +90,53 @@
 
                 <form onsubmit="handleOrderSubmission(event)" class="space-y-4">
                     <h3 class="font-bold text-sm text-slate-800">1. Datos Personales</h3>
+                    
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="text-[10px] font-bold text-slate-600">Nombre Completo *</label>
-                            <input type="text" id="cust-name" required class="w-full p-2.5 rounded-xl text-xs border bg-white outline-none">
+                            <input type="text" id="cust-name" required placeholder="Ej: Juan Pérez" class="w-full p-2.5 rounded-xl text-xs border bg-white outline-none">
                         </div>
                         <div>
                             <label class="text-[10px] font-bold text-slate-600">Cédula de Identidad *</label>
-                            <input type="text" id="cust-ci" required placeholder="V-12345678" class="w-full p-2.5 rounded-xl text-xs border bg-white outline-none">
+                            <input type="text" id="cust-ci" required placeholder="Ej: V-12345678" class="w-full p-2.5 rounded-xl text-xs border bg-white outline-none">
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
+
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-600">Género *</label>
+                        <select id="cust-gender" required class="w-full p-2.5 rounded-xl text-xs border bg-white outline-none font-medium">
+                            <option value="" disabled selected>Seleccione su género</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Prefiero no contestar">Prefiero no contestar</option>
+                        </select>
+                    </div>
+
+                    <!-- WhatsApp Principal con Selector de Código de Área -->
+                    <div class="grid grid-cols-3 gap-2">
                         <div>
-                            <label class="text-[10px] font-bold text-slate-600">WhatsApp *</label>
-                            <input type="text" id="cust-phone" required placeholder="04141234567" class="w-full p-2.5 rounded-xl text-xs border bg-white outline-none">
+                            <label class="text-[10px] font-bold text-slate-600">Código País *</label>
+                            <select id="cust-phone-code" onchange="checkPhoneRequirement()" class="w-full p-2.5 rounded-xl text-xs border bg-white outline-none font-bold">
+                                <option value="+58" selected>🇻🇪 +58 (Venezuela)</option>
+                                <option value="+57">🇨🇴 +57 (Colombia)</option>
+                                <option value="+1">🇺🇸 +1 (EE.UU.)</option>
+                                <option value="+34">🇪🇸 +34 (España)</option>
+                                <option value="+51">🇵🇪 +51 (Perú)</option>
+                                <option value="+54">🇦🇷 +54 (Argentina)</option>
+                                <option value="+52">🇲🇽 +52 (México)</option>
+                                <option value="+507">🇵🇦 +507 (Panamá)</option>
+                            </select>
                         </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-600">Teléfono Secundario (Opcional)</label>
-                            <input type="text" id="cust-phone2" placeholder="04121234567" class="w-full p-2.5 rounded-xl text-xs border bg-white outline-none">
+                        <div class="col-span-2">
+                            <label class="text-[10px] font-bold text-slate-600">WhatsApp Principal *</label>
+                            <input type="text" id="cust-phone" required placeholder="4141234567" class="w-full p-2.5 rounded-xl text-xs border bg-white outline-none">
                         </div>
+                    </div>
+
+                    <!-- Teléfono Secundario -->
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-600" id="label-phone2">Teléfono Secundario (Opcional)</label>
+                        <input type="text" id="cust-phone2" placeholder="Número adicional de contacto" class="w-full p-2.5 rounded-xl text-xs border bg-white outline-none">
                     </div>
 
                     <h3 class="font-bold text-sm text-slate-800 pt-2">2. Método de Entrega</h3>
@@ -123,7 +151,6 @@
                         </label>
                     </div>
 
-                    <!-- Empresa de Envío (ZOOM) -->
                     <div id="delivery-info" class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
                         <div class="flex items-center gap-3">
                             <img src="https://i.postimg.cc/MGLYYfxW/zoom.jpg" class="h-10 rounded shadow object-cover" alt="ZOOM Logo">
@@ -145,7 +172,6 @@
                         <option value="PagoMovil">Pago Móvil</option>
                     </select>
 
-                    <!-- Cuentas Bancarias -->
                     <div id="pay-details-transf" class="p-4 bg-sky-50 border border-sky-200 rounded-xl text-xs text-sky-900 space-y-1">
                         <p class="font-bold">🏦 Datos Transferencia Bancaria:</p>
                         <p>Cuenta: <strong>01380014650140507795</strong></p>
@@ -182,7 +208,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD3vPGQuQosfgpDqPQOipFS0ArTcz_Jl94",
@@ -236,13 +262,68 @@
 
         renderCheckoutSummary();
 
-        // Control de Sesión
-        onAuthStateChanged(auth, (user) => {
+        // Control de Requerimiento de Teléfono Secundario si código no es +58
+        window.checkPhoneRequirement = function() {
+            const code = document.getElementById('cust-phone-code').value;
+            const phone2Input = document.getElementById('cust-phone2');
+            const labelPhone2 = document.getElementById('label-phone2');
+
+            if (code !== '+58') {
+                phone2Input.required = true;
+                labelPhone2.innerHTML = 'Teléfono Secundario <span class="text-rose-500">* (Obligatorio por no ser +58)</span>';
+            } else {
+                phone2Input.required = false;
+                labelPhone2.innerText = 'Teléfono Secundario (Opcional)';
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
                 document.getElementById('step-auth').style.display = 'none';
                 document.getElementById('step-checkout').style.display = 'block';
                 document.getElementById('user-display-email').innerText = "Sesión: " + user.email;
+
+                const userSnap = await getDoc(doc(db, "clients", user.uid));
+                const nameInput = document.getElementById('cust-name');
+                const ciInput = document.getElementById('cust-ci');
+
+                if (userSnap.exists()) {
+                    const data = userSnap.data();
+                    
+                    // Solo si ya existía un nombre registrado lo bloquea
+                    if (data.nombre) {
+                        nameInput.value = data.nombre;
+                        nameInput.disabled = true;
+                        nameInput.classList.add('bg-slate-100', 'text-slate-500', 'cursor-not-allowed');
+                    } else {
+                        nameInput.disabled = false;
+                        nameInput.classList.remove('bg-slate-100', 'text-slate-500', 'cursor-not-allowed');
+                    }
+
+                    // Solo si ya existía una cédula registrada la bloquea
+                    if (data.cedula) {
+                        ciInput.value = data.cedula;
+                        ciInput.disabled = true;
+                        ciInput.classList.add('bg-slate-100', 'text-slate-500', 'cursor-not-allowed');
+                    } else {
+                        ciInput.disabled = false;
+                        ciInput.classList.remove('bg-slate-100', 'text-slate-500', 'cursor-not-allowed');
+                    }
+
+                    if (data.genero) document.getElementById('cust-gender').value = data.genero;
+                    if (data.codigo_pais) document.getElementById('cust-phone-code').value = data.codigo_pais;
+                    if (data.telefono) document.getElementById('cust-phone').value = data.telefono;
+                    if (data.telefono_secundario && data.telefono_secundario !== "N/A") document.getElementById('cust-phone2').value = data.telefono_secundario;
+                    if (data.direccion) document.getElementById('cust-address').value = data.direccion;
+                    checkPhoneRequirement();
+                } else {
+                    // Usuario completamente nuevo
+                    nameInput.disabled = false;
+                    ciInput.disabled = false;
+                    nameInput.classList.remove('bg-slate-100', 'text-slate-500', 'cursor-not-allowed');
+                    ciInput.classList.remove('bg-slate-100', 'text-slate-500', 'cursor-not-allowed');
+                }
             } else {
                 currentUser = null;
                 document.getElementById('step-auth').style.display = 'block';
@@ -281,7 +362,6 @@
             document.getElementById('pay-details-pm').style.display = val === 'PagoMovil' ? 'block' : 'none';
         };
 
-        // Compresión de Comprobante
         function compressReceipt(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -301,19 +381,25 @@
             });
         }
 
-        // Guardar Orden Completa
         window.handleOrderSubmission = async function(e) {
             e.preventDefault();
             if (cart.length === 0) return alert("El carrito está vacío.");
 
+            const phoneCode = document.getElementById('cust-phone-code').value;
+            const phone = document.getElementById('cust-phone').value;
+            const phone2 = document.getElementById('cust-phone2').value;
+
+            if (phoneCode !== '+58' && !phone2) {
+                return alert("Al no ser un número de WhatsApp de Venezuela (+58), el teléfono secundario es obligatorio.");
+            }
+
             const btn = document.getElementById('btn-finish-order');
             btn.disabled = true;
-            btn.innerText = "Procesando pedido y comprobante...";
+            btn.innerText = "Procesando pedido...";
 
             const name = document.getElementById('cust-name').value;
             const ci = document.getElementById('cust-ci').value;
-            const phone = document.getElementById('cust-phone').value;
-            const phone2 = document.getElementById('cust-phone2').value || "N/A";
+            const gender = document.getElementById('cust-gender').value;
             const deliveryMode = document.querySelector('input[name="delivery"]:checked').value;
             const state = document.getElementById('cust-state').value || "N/A";
             const city = document.getElementById('cust-city').value || "N/A";
@@ -322,9 +408,7 @@
             const receiptFile = document.getElementById('pay-receipt').files[0];
 
             let receiptBase64 = "";
-            if (receiptFile) {
-                receiptBase64 = await compressReceipt(receiptFile);
-            }
+            if (receiptFile) receiptBase64 = await compressReceipt(receiptFile);
 
             let totalUsd = cart.reduce((sum, i) => sum + (i.precio * i.qty), 0);
             let totalBs = totalUsd * tasa;
@@ -334,9 +418,11 @@
                     uid: currentUser.uid,
                     cliente: name,
                     cedula: ci,
+                    genero: gender,
                     correo: currentUser.email,
-                    telefono: phone,
-                    telefono_secundario: phone2,
+                    codigo_pais: phoneCode,
+                    telefono: `${phoneCode} ${phone}`,
+                    telefono_secundario: phone2 || "N/A",
                     tipo_entrega: deliveryMode === 'envio' ? 'Envío Nacional (ZOOM)' : 'Recogida en Tienda',
                     estado: state,
                     ciudad: city,
@@ -347,25 +433,25 @@
                     total_ref: totalUsd,
                     total_bs: totalBs,
                     tasa_aplicada: tasa,
-                    estatus: deliveryMode === 'envio' ? "En Proceso" : "Listo para Recogida en Tienda",
+                    estatus: "En Proceso",
                     tracking: "RM-" + Math.floor(100000 + Math.random() * 900000),
-                    user_journey: JSON.parse(localStorage.getItem('rm_user_journey')) || [],
                     created_at: new Date()
                 };
 
-                // Guardar en Firestore
                 await addDoc(collection(db, "orders"), orderData);
 
-                // Guardar datos del cliente
-                await addDoc(collection(db, "clients"), {
+                await setDoc(doc(db, "clients", currentUser.uid), {
                     uid: currentUser.uid,
                     nombre: name,
                     cedula: ci,
+                    genero: gender,
                     correo: currentUser.email,
+                    codigo_pais: phoneCode,
                     telefono: phone,
+                    telefono_secundario: phone2 || "N/A",
                     direccion: `${state}, ${city} - ${address}`,
-                    created_at: new Date()
-                });
+                    updated_at: new Date()
+                }, { merge: true });
 
                 localStorage.removeItem('rm_cart');
                 window.location.href = 'myaccount.html';

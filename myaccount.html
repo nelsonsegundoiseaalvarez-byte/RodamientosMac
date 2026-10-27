@@ -16,28 +16,126 @@
 </head>
 <body class="flex flex-col min-h-screen">
 
+    <!-- Header -->
     <header class="gradient-header text-white shadow-md">
         <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <img src="https://i.postimg.cc/gJFWTtwg/photo-2026-09-18-11-07-31.jpg" class="w-10 h-10 rounded-full border-2 border-white object-cover shadow" alt="Logo">
-                <h1 class="font-extrabold text-base">Mis Pedidos - Rodamientos RM</h1>
+                <h1 class="font-extrabold text-base">Portal del Cliente - Rodamientos RM</h1>
             </div>
-            <a href="index.html" class="text-xs font-bold underline text-sky-100">← Ir a la Tienda</a>
+            <a href="index.html" class="text-xs font-bold underline text-sky-100">← Volver al Catálogo</a>
         </div>
     </header>
 
-    <main class="flex-1 max-w-5xl mx-auto px-6 py-10 w-full space-y-8">
+    <!-- Main Workspace -->
+    <main class="flex-1 max-w-6xl mx-auto px-6 py-10 w-full space-y-8">
         
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-800">Estado de tus Pedidos</h1>
-                <p class="text-xs text-slate-400" id="user-email-display">Cargando datos del cliente...</p>
+        <div id="toast-msg" class="hidden p-4 rounded-2xl text-sm font-semibold border shadow"></div>
+
+        <!-- Header Perfil Cliente Bento UI -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="soft-card p-6 col-span-2 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center font-bold text-2xl border-2 border-sky-300">
+                        👤
+                    </div>
+                    <div>
+                        <h2 id="profile-name" class="text-xl font-extrabold text-slate-800">Cargando Perfil...</h2>
+                        <p id="profile-email" class="text-xs text-slate-500 font-medium">Cargando correo...</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span id="profile-ci" class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-600">C.I: Carga...</span>
+                            <span id="profile-gender" class="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-sky-100 text-sky-700">Género: Carga...</span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="toggleEditProfileModal()" class="px-4 py-2 bg-sky-50 text-sky-600 font-bold rounded-xl text-xs hover:bg-sky-100 transition border border-sky-200">
+                    ✏️ Editar Perfil
+                </button>
             </div>
-            <button onclick="handleLogout()" class="px-4 py-2 bg-rose-50 text-rose-600 font-bold rounded-xl text-xs hover:bg-rose-100 transition">Cerrar Sesión</button>
+
+            <div class="soft-card p-6 flex flex-col justify-between">
+                <div>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">WhatsApp / Contacto</span>
+                    <strong id="profile-phone" class="text-sm text-sky-600 font-extrabold">...</strong>
+                    <span class="text-[10px] font-bold text-slate-400 block mt-2">Dirección Habitual:</span>
+                    <p id="profile-address" class="text-xs text-slate-600 line-clamp-2 font-medium">...</p>
+                </div>
+                <button onclick="handleLogout()" class="w-full mt-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-xl text-xs transition">
+                    Cerrar Sesión
+                </button>
+            </div>
         </div>
 
-        <div id="orders-list" class="space-y-6">
-            <div class="soft-card p-8 text-center text-slate-400 text-sm">Cargando historial de pedidos...</div>
+        <!-- Modal Editar Perfil -->
+        <div id="edit-profile-modal" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" style="display: none;">
+            <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-4">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <h3 class="font-bold text-slate-800 text-base">Actualizar Datos de Perfil</h3>
+                    <button onclick="toggleEditProfileModal()" class="text-slate-400 hover:text-slate-600 text-sm">✕</button>
+                </div>
+                <form onsubmit="saveProfileChanges(event)" class="space-y-3">
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 block mb-1">Nombre Completo (No editable)</label>
+                        <input type="text" id="edit-name" disabled class="w-full p-2.5 rounded-xl text-xs border bg-slate-100 text-slate-500 font-bold outline-none cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 block mb-1">Cédula de Identidad (No editable)</label>
+                        <input type="text" id="edit-ci" disabled class="w-full p-2.5 rounded-xl text-xs border bg-slate-100 text-slate-500 font-bold outline-none cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-600 block mb-1">Género *</label>
+                        <select id="edit-gender" required class="w-full p-2.5 rounded-xl text-xs border bg-slate-50 outline-none">
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Prefiero no contestar">Prefiero no contestar</option>
+                        </select>
+                    </div>
+
+                    <!-- WhatsApp Principal con Código de Área -->
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-600 block mb-1">Código País *</label>
+                            <select id="edit-phone-code" onchange="checkEditPhoneRequirement()" class="w-full p-2.5 rounded-xl text-xs border bg-slate-50 outline-none font-bold">
+                                <option value="+58">+58 (VE)</option>
+                                <option value="+57">+57 (CO)</option>
+                                <option value="+1">+1 (US)</option>
+                                <option value="+34">+34 (ES)</option>
+                                <option value="+51">+51 (PE)</option>
+                                <option value="+54">+54 (AR)</option>
+                                <option value="+52">+52 (MX)</option>
+                                <option value="+507">+507 (PA)</option>
+                            </select>
+                        </div>
+                        <div class="col-span-2">
+                            <label class="text-[10px] font-bold text-slate-600 block mb-1">WhatsApp Principal *</label>
+                            <input type="text" id="edit-phone" required class="w-full p-2.5 rounded-xl text-xs border bg-slate-50 outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-600 block mb-1" id="edit-label-phone2">Teléfono Secundario</label>
+                        <input type="text" id="edit-phone2" class="w-full p-2.5 rounded-xl text-xs border bg-slate-50 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-600 block mb-1">Dirección Predeterminada de Envío</label>
+                        <textarea id="edit-address" rows="2" required class="w-full p-2.5 rounded-xl text-xs border bg-slate-50 outline-none"></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-xs shadow transition">
+                        Guardar Cambios
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tracking y Estado de Pedidos -->
+        <div class="space-y-4">
+            <h2 class="text-xl font-extrabold text-slate-800 flex items-center gap-2">
+                <i data-lucide="package" class="w-6 h-6 text-sky-500"></i> Seguimiento de Pedidos y Guía de Envío
+            </h2>
+            <div id="my-orders-list" class="space-y-6">
+                <div class="soft-card p-8 text-center text-slate-400 text-sm">Cargando tus pedidos...</div>
+            </div>
         </div>
 
     </main>
@@ -50,7 +148,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, onSnapshot, setDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD3vPGQuQosfgpDqPQOipFS0ArTcz_Jl94",
@@ -65,71 +163,166 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        let currentUid = null;
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast-msg');
+            toast.innerText = msg;
+            toast.className = "mb-6 p-4 rounded-2xl text-sm font-semibold border shadow bg-emerald-50 text-emerald-600 border-emerald-200";
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 4000);
+        }
+
         window.handleLogout = function() {
             signOut(auth).then(() => window.location.href = 'index.html');
         };
 
-        onAuthStateChanged(auth, (user) => {
+        window.toggleEditProfileModal = function() {
+            const modal = document.getElementById('edit-profile-modal');
+            modal.style.display = modal.style.display === 'none' ? 'flex' : 'none';
+        };
+
+        window.checkEditPhoneRequirement = function() {
+            const code = document.getElementById('edit-phone-code').value;
+            const phone2Input = document.getElementById('edit-phone2');
+            const labelPhone2 = document.getElementById('edit-label-phone2');
+
+            if (code !== '+58') {
+                phone2Input.required = true;
+                labelPhone2.innerHTML = 'Teléfono Secundario <span class="text-rose-500">* (Obligatorio)</span>';
+            } else {
+                phone2Input.required = false;
+                labelPhone2.innerText = 'Teléfono Secundario (Opcional)';
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'cart.html';
             } else {
-                document.getElementById('user-email-display').innerText = "Cliente: " + user.email;
-                loadMyOrders(user.uid);
+                currentUid = user.uid;
+                document.getElementById('profile-email').innerText = user.email;
+                await loadUserProfileData(user.uid);
+                loadCustomerOrders(user.uid);
             }
         });
 
-        function loadMyOrders(uid) {
-            const container = document.getElementById('orders-list');
+        async function loadUserProfileData(uid) {
+            try {
+                const userDoc = await getDoc(doc(db, "clients", uid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    document.getElementById('profile-name').innerText = data.nombre || "Cliente Registrado";
+                    document.getElementById('profile-ci').innerText = "C.I: " + (data.cedula || "N/A");
+                    document.getElementById('profile-gender').innerText = "Género: " + (data.genero || "No especificado");
+                    document.getElementById('profile-phone').innerText = `${data.codigo_pais || '+58'} ${data.telefono || 'Sin teléfono'}`;
+                    document.getElementById('profile-address').innerText = data.direccion || "Sin dirección guardada";
+
+                    document.getElementById('edit-name').value = data.nombre || "";
+                    document.getElementById('edit-ci').value = data.cedula || "";
+                    document.getElementById('edit-gender').value = data.genero || "Prefiero no contestar";
+                    if (data.codigo_pais) document.getElementById('edit-phone-code').value = data.codigo_pais;
+                    document.getElementById('edit-phone').value = data.telefono || "";
+                    document.getElementById('edit-phone2').value = (data.telefono_secundario && data.telefono_secundario !== "N/A") ? data.telefono_secundario : "";
+                    document.getElementById('edit-address').value = data.direccion || "";
+                    checkEditPhoneRequirement();
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        window.saveProfileChanges = async function(e) {
+            e.preventDefault();
+            const phoneCode = document.getElementById('edit-phone-code').value;
+            const phone = document.getElementById('edit-phone').value;
+            const phone2 = document.getElementById('edit-phone2').value;
+
+            if (phoneCode !== '+58' && !phone2) {
+                return alert("Al no ser un número de WhatsApp de Venezuela (+58), el teléfono secundario es obligatorio.");
+            }
+
+            try {
+                await setDoc(doc(db, "clients", currentUid), {
+                    genero: document.getElementById('edit-gender').value,
+                    codigo_pais: phoneCode,
+                    telefono: phone,
+                    telefono_secundario: phone2 || "N/A",
+                    direccion: document.getElementById('edit-address').value,
+                    updated_at: new Date()
+                }, { merge: true });
+
+                showToast("¡Perfil actualizado con éxito!");
+                toggleEditProfileModal();
+                loadUserProfileData(currentUid);
+            } catch (err) {
+                alert("Error al actualizar perfil: " + err.message);
+            }
+        };
+
+        function loadCustomerOrders(uid) {
+            const container = document.getElementById('my-orders-list');
             const q = query(collection(db, "orders"), where("uid", "==", uid));
 
             onSnapshot(q, (snapshot) => {
                 if (snapshot.empty) {
-                    container.innerHTML = '<div class="soft-card p-8 text-center text-slate-400 text-sm">No has realizado ningún pedido aún.</div>';
+                    container.innerHTML = '<div class="soft-card p-8 text-center text-slate-400 text-sm">Aún no has realizado ninguna compra.</div>';
                     return;
                 }
 
                 let html = '';
+
                 snapshot.forEach(docSnap => {
                     const order = docSnap.data();
+
                     const statusColors = {
-                        "En Proceso": "bg-amber-100 text-amber-700 border-amber-200",
-                        "Enviado": "bg-sky-100 text-sky-700 border-sky-200",
-                        "Entregado": "bg-emerald-100 text-emerald-700 border-emerald-200",
-                        "Listo para Recogida en Tienda": "bg-purple-100 text-purple-700 border-purple-200"
+                        "En Proceso": "bg-amber-100 text-amber-800 border-amber-200",
+                        "Enviado": "bg-sky-100 text-sky-800 border-sky-200",
+                        "Listo para Recogida en Tienda": "bg-purple-100 text-purple-800 border-purple-200",
+                        "Entregado": "bg-emerald-100 text-emerald-800 border-emerald-200"
+                    };
+
+                    const statusIcons = {
+                        "En Proceso": "⏳ En preparación",
+                        "Enviado": "🚚 En tránsito (ZOOM)",
+                        "Listo para Recogida en Tienda": "🏬 Listo en tienda",
+                        "Entregado": "✅ Entregado con éxito"
                     };
 
                     html += `
                         <div class="soft-card p-6 space-y-4">
-                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-4">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b pb-4">
                                 <div>
-                                    <span class="text-[10px] font-bold text-slate-400">N° TRACKING:</span>
-                                    <h3 class="text-base font-extrabold text-blue-900">${order.tracking}</h3>
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">CÓDIGO DE GUÍA / TRACKING:</span>
+                                    <h3 class="text-lg font-black text-blue-900">${order.tracking || 'Pendiente por asignar'}</h3>
                                 </div>
                                 <div>
-                                    <span class="px-3 py-1 rounded-full text-xs font-bold border ${statusColors[order.estatus] || 'bg-slate-100 text-slate-700'}">
-                                        📌 ${order.estatus}
+                                    <span class="px-3 py-1.5 rounded-xl text-xs font-extrabold border ${statusColors[order.estatus] || 'bg-slate-100 text-slate-800'}">
+                                        ${statusIcons[order.estatus] || order.estatus}
                                     </span>
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-slate-50 p-4 rounded-xl">
                                 <div>
-                                    <p class="font-bold text-slate-700">Detalles de Entrega:</p>
-                                    <p class="text-slate-500">${order.tipo_entrega}</p>
+                                    <p class="font-bold text-slate-700">Modalidad de Entrega:</p>
+                                    <p class="text-slate-600 font-semibold">${order.tipo_entrega}</p>
                                     <p class="text-slate-500">📍 ${order.direccion}</p>
                                 </div>
                                 <div>
+                                    <p class="font-bold text-slate-700">Método de Pago:</p>
+                                    <p class="text-slate-600">${order.metodo_pago}</p>
+                                </div>
+                                <div>
                                     <p class="font-bold text-slate-700">Monto Total:</p>
-                                    <p class="text-sky-600 font-extrabold text-sm">$${order.total_ref.toFixed(2)} REF</p>
+                                    <p class="text-sky-600 font-black text-sm">$${order.total_ref.toFixed(2)} REF</p>
                                     <p class="text-slate-500 font-semibold">${order.total_bs.toLocaleString('es-VE')} Bs</p>
                                 </div>
                             </div>
 
                             <div class="border-t pt-3">
-                                <p class="text-xs font-bold text-slate-700 mb-2">Productos:</p>
+                                <p class="text-xs font-bold text-slate-700 mb-2">Productos Comprados:</p>
                                 <div class="flex flex-wrap gap-2">
                                     ${order.productos.map(p => `
-                                        <span class="px-2.5 py-1 bg-slate-100 rounded-lg text-[11px] font-semibold text-slate-600">
+                                        <span class="px-3 py-1 bg-sky-50 border border-sky-100 rounded-lg text-xs font-semibold text-sky-900">
                                             ${p.titulo} (x${p.qty})
                                         </span>
                                     `).join('')}

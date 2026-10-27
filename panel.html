@@ -15,9 +15,6 @@
             --azul-corp: #0C3B7C;
             --azul-celeste: #00A8E8;
             --blanco: #FFFFFF;
-            --gris-claro: #E5E7EB;
-            --rojo-acento: #E63946;
-            --gris-oscuro: #1F2937;
             --bg-main: #F4F6FA;
             --bg-card: #FFFFFF;
             --text-main: #1F2937;
@@ -48,15 +45,16 @@
 </head>
 <body>
 
-    <!-- Pantalla de Login -->
+    <!-- Login Admin -->
     <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900" style="display: flex;">
         <div class="bg-slate-900 border border-sky-900 rounded-2xl p-8 w-full max-w-md shadow-2xl text-center">
             <img src="https://i.postimg.cc/gJFWTtwg/photo-2026-09-18-11-07-31.jpg" class="w-20 h-20 rounded-full mx-auto mb-4 border-2 border-sky-400 object-cover" alt="Logo">
-            <h2 class="text-white text-xl font-bold mb-6">Panel Administrativo</h2>
+            <h2 class="text-white text-xl font-bold mb-2">Panel Administrativo</h2>
+            <p class="text-xs text-slate-400 mb-6">Acceso exclusivo para personal autorizado</p>
             <div id="login-error" class="mb-4 text-rose-500 text-xs font-semibold"></div>
             <form id="form-admin-login" onsubmit="handleAdminLogin(event)" class="space-y-4 text-left">
                 <div>
-                    <label class="block mb-2 text-xs text-slate-300 font-bold">Correo Electrónico</label>
+                    <label class="block mb-2 text-xs text-slate-300 font-bold">Correo Administrativo</label>
                     <input type="email" id="login-email" required class="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm outline-none focus:border-sky-400" placeholder="admin@rodamientosrm.com">
                 </div>
                 <div>
@@ -91,6 +89,9 @@
                     <button onclick="switchTab('compras')" id="nav-compras" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition">
                         <i data-lucide="shopping-bag" class="w-4 h-4"></i> Compras / Despacho
                     </button>
+                    <button onclick="switchTab('historial')" id="nav-historial" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i> Historial de Órdenes
+                    </button>
                     <button onclick="switchTab('clientes')" id="nav-clientes" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-50 transition">
                         <i data-lucide="users" class="w-4 h-4"></i> Clientes
                     </button>
@@ -116,15 +117,14 @@
         <!-- Main Workspace -->
         <main class="flex-1 p-6 md:p-10 overflow-y-auto">
 
-            <!-- Mensajes de Notificación -->
             <div id="toast-msg" class="hidden mb-6 p-4 rounded-2xl text-sm font-semibold border shadow"></div>
 
-            <!-- TAB 1: DASHBOARD -->
+            <!-- TAB 1: DASHBOARD CON GRÁFICOS REALES -->
             <div id="tab-dashboard" class="tab-content active space-y-8">
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-2xl font-bold text-slate-800">Dashboard General</h1>
-                        <p class="text-xs text-slate-400">Resumen financiero y control de tasa diaria</p>
+                        <p class="text-xs text-slate-400">Resumen financiero y métricas en tiempo real</p>
                     </div>
                 </div>
 
@@ -143,17 +143,15 @@
                     </div>
 
                     <div class="gradient-card-3 p-6 rounded-3xl text-white shadow-lg">
-                        <span class="text-xs uppercase tracking-wider font-semibold opacity-90">Total Pedidos Globales</span>
+                        <span class="text-xs uppercase tracking-wider font-semibold opacity-90">Total Pedidos Registrados</span>
                         <div id="dash-total-pedidos" class="text-3xl font-extrabold my-2">0</div>
                     </div>
                 </div>
 
-                <!-- Alerta Dashboard: Stock Bajo -->
+                <!-- Alerta Stock Bajo -->
                 <div class="soft-card p-6 border-rose-200 bg-rose-50/20">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-bold text-lg text-rose-600 flex items-center gap-2">
-                            ⚠️ Alerta de Stock Bajo (≤ 6 unidades)
-                        </h3>
+                        <h3 class="font-bold text-lg text-rose-600 flex items-center gap-2">⚠️ Alerta de Stock Bajo (≤ 6 unidades)</h3>
                         <span id="dash-low-stock-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-rose-500 text-white">0 productos</span>
                     </div>
                     <div id="dash-low-stock-list" class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -161,10 +159,16 @@
                     </div>
                 </div>
 
-                <!-- Gráfico de Velas Japonesas -->
-                <div class="soft-card p-6">
-                    <h3 class="font-bold text-lg mb-4 text-slate-800">Gráfico de Rendimiento de Ventas (Velas Japonesas)</h3>
-                    <div id="candlestick-chart"></div>
+                <!-- Gráficos Funcionales -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="soft-card p-6">
+                        <h3 class="font-bold text-base mb-4 text-slate-800">📊 Fluctuación de Ventas Diarias (Velas)</h3>
+                        <div id="candlestick-chart"></div>
+                    </div>
+                    <div class="soft-card p-6">
+                        <h3 class="font-bold text-base mb-4 text-slate-800">🥧 Distribución de Productos por Categoría</h3>
+                        <div id="pie-chart"></div>
+                    </div>
                 </div>
             </div>
 
@@ -182,7 +186,7 @@
                             <input type="text" id="prod-parte" required class="w-full p-2.5 rounded-xl text-sm border border-gray-200 outline-none bg-white">
                         </div>
                         <div>
-                            <label class="text-xs font-bold block mb-1 text-slate-600">Categoría del Producto *</label>
+                            <label class="text-xs font-bold block mb-1 text-slate-600">Categoría *</label>
                             <select id="prod-categoria" required class="w-full p-2.5 rounded-xl text-sm border border-gray-200 outline-none bg-white">
                                 <option value="Rodamiento">Rodamiento</option>
                                 <option value="Esteperas">Esteperas</option>
@@ -190,8 +194,6 @@
                                 <option value="Chumaceras">Chumaceras</option>
                                 <option value="Cubos de rueda">Cubos de rueda</option>
                                 <option value="Crucetas">Crucetas</option>
-                                <option value="Soporte de cardan">Soporte de cardan</option>
-                                <option value="Piñones">Piñones</option>
                                 <option value="Otros">Otros</option>
                             </select>
                         </div>
@@ -204,7 +206,7 @@
                             <input type="number" id="prod-stock" required class="w-full p-2.5 rounded-xl text-sm border border-gray-200 outline-none bg-white">
                         </div>
                         <div>
-                            <label class="text-xs font-bold block mb-1 text-slate-600">Fotografía del Producto *</label>
+                            <label class="text-xs font-bold block mb-1 text-slate-600">Fotografía *</label>
                             <input type="file" id="prod-imagen" accept="image/*" required class="w-full p-2 rounded-xl text-xs border border-gray-200 outline-none bg-white">
                         </div>
                         <div class="md:col-span-3 flex justify-end">
@@ -236,20 +238,29 @@
                 </div>
             </div>
 
-            <!-- TAB 3: PEDIDOS / COMPRAS Y DESPACHO -->
+            <!-- TAB 3: DESPACHO Y COMPRAS ACTIVAS -->
             <div id="tab-compras" class="tab-content space-y-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-800">Gestión de Compras y Despacho</h2>
-                        <p class="text-xs text-slate-400">Visualiza comprobantes, detalles de clientes y actualiza el estatus del envío</p>
-                    </div>
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Despacho y Gestión de Envíos Activos</h2>
+                    <p class="text-xs text-slate-400">Administra órdenes en proceso, asigna la guía de tracking de ZOOM y actualiza el estatus.</p>
                 </div>
-                <div id="orders-container" class="space-y-6">
-                    <div class="soft-card p-8 text-center text-slate-400 text-sm">Cargando pedidos de clientes...</div>
+                <div id="active-orders-container" class="space-y-6">
+                    <div class="soft-card p-8 text-center text-slate-400 text-sm">Cargando pedidos activos...</div>
                 </div>
             </div>
 
-            <!-- TAB 4: CLIENTES -->
+            <!-- TAB 4: PESTAÑA INDEPENDIENTE - HISTORIAL DE ÓRDENES ENTREGADAS -->
+            <div id="tab-historial" class="tab-content space-y-6">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Historial de Órdenes Completadas (Entregados)</h2>
+                    <p class="text-xs text-slate-400">Registro histórico de todas las compras finalizadas con éxito.</p>
+                </div>
+                <div id="history-orders-container" class="space-y-6">
+                    <div class="soft-card p-8 text-center text-slate-400 text-sm">No hay pedidos finalizados en el historial.</div>
+                </div>
+            </div>
+
+            <!-- TAB 5: CLIENTES -->
             <div id="tab-clientes" class="tab-content space-y-6">
                 <div class="soft-card p-6">
                     <h3 class="font-bold text-lg mb-4 text-slate-800">Base de Datos de Clientes</h3>
@@ -264,14 +275,14 @@
                                 </tr>
                             </thead>
                             <tbody id="clients-table-body">
-                                <tr><td colspan="4" class="p-3 text-center text-slate-400">Sin clientes registrados aún.</td></tr>
+                                <tr><td colspan="4" class="p-3 text-center text-slate-400">Sin clientes.</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 5: USUARIOS -->
+            <!-- TAB 6: USUARIOS -->
             <div id="tab-usuarios" class="tab-content space-y-8">
                 <div class="soft-card p-6 max-w-xl">
                     <h3 class="font-bold text-lg mb-4 text-slate-800">Crear Usuario Administrador o Empleado</h3>
@@ -315,11 +326,11 @@
                 </div>
             </div>
 
-            <!-- TAB 6: AVANZADO -->
+            <!-- TAB 7: AVANZADO -->
             <div id="tab-avanzado" class="tab-content space-y-6">
                 <div class="soft-card p-6 border-rose-200 bg-rose-50/30 max-w-xl">
                     <h3 class="font-bold text-lg mb-2 text-rose-600">Zona de Peligro / Limpiar Base de Datos</h3>
-                    <p class="text-xs text-slate-600 mb-4">Esta acción eliminará todos los productos y órdenes de prueba para dejar el sistema limpio para su entrega final.</p>
+                    <p class="text-xs text-slate-600 mb-4">Esta acción eliminará todos los productos y órdenes de prueba.</p>
                     <button onclick="handleCleanDatabase()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 rounded-xl text-sm shadow transition">Limpiar Base de Datos (Resetear)</button>
                 </div>
             </div>
@@ -331,7 +342,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD3vPGQuQosfgpDqPQOipFS0ArTcz_Jl94",
@@ -346,6 +357,9 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        let candleChartInstance = null;
+        let pieChartInstance = null;
+
         function showToast(msg, isError = false) {
             const toast = document.getElementById('toast-msg');
             toast.innerText = msg;
@@ -354,25 +368,21 @@
             setTimeout(() => toast.classList.add('hidden'), 4000);
         }
 
-        // Tasa Global
         window.saveTasaGlobal = async function() {
             const tasaVal = parseFloat(document.getElementById('input-tasa-global').value);
             if (!tasaVal || tasaVal <= 0) return alert("Ingrese un valor de tasa válido.");
             try {
                 await setDoc(doc(db, "settings", "tasa_usd"), { value: tasaVal });
-                showToast("¡Tasa del día actualizada correctamente a " + tasaVal + " Bs!");
+                showToast("Tasa actualizada a " + tasaVal + " Bs.");
             } catch (e) { showToast("Error: " + e.message, true); }
         };
 
         function listenTasaGlobal() {
             onSnapshot(doc(db, "settings", "tasa_usd"), (docSnap) => {
-                if (docSnap.exists()) {
-                    document.getElementById('input-tasa-global').value = docSnap.data().value;
-                }
+                if (docSnap.exists()) { document.getElementById('input-tasa-global').value = docSnap.data().value; }
             });
         }
 
-        // Compresión de imagen de producto
         function compressImage(file, maxWidth = 400, quality = 0.7) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -382,14 +392,9 @@
                     img.src = event.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-                        canvas.width = width;
-                        canvas.height = height;
+                        let width = img.width, height = img.height;
+                        if (width > maxWidth) { height = Math.round((height * maxWidth) / width); width = maxWidth; }
+                        canvas.width = width; canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
                         resolve(canvas.toDataURL('image/jpeg', quality));
@@ -401,9 +406,7 @@
         window.handleAddProduct = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-save-prod');
-            btn.disabled = true;
-            btn.innerText = "Guardando...";
-
+            btn.disabled = true; btn.innerText = "Guardando...";
             try {
                 const titulo = document.getElementById('prod-titulo').value;
                 const parte = document.getElementById('prod-parte').value;
@@ -418,42 +421,34 @@
                 await addDoc(collection(db, "products"), {
                     titulo, numero_parte: parte, categoria, precio_ref: precio, stock, active: true, imagen: photoUrl, created_at: new Date()
                 });
-
-                showToast("¡Producto publicado en el catálogo con éxito!");
+                showToast("Producto publicado correctamente.");
                 document.getElementById('form-add-product').reset();
-            } catch (err) {
-                showToast("Error al guardar producto: " + err.message, true);
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Publicar Producto";
-            }
+            } catch (err) { showToast("Error: " + err.message, true); }
+            finally { btn.disabled = false; btn.innerText = "Publicar Producto"; }
         };
 
-        // Cargar Inventario y Alertas Dashboard
+        // INVENTARIO Y GRÁFICO TIPO PASTEL DINÁMICO
         window.loadInventory = function() {
             const tbody = document.getElementById('inventory-table-body');
             const dashList = document.getElementById('dash-low-stock-list');
             const dashBadge = document.getElementById('dash-low-stock-badge');
-            const totalVentasEl = document.getElementById('dash-total-ventas');
-            const totalPedidosEl = document.getElementById('dash-total-pedidos');
 
             onSnapshot(collection(db, "products"), (querySnapshot) => {
                 if (querySnapshot.empty) {
                     tbody.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-slate-400">No hay productos.</td></tr>';
                     dashList.innerHTML = '<p class="text-xs text-slate-400 col-span-3">No hay productos.</p>';
                     dashBadge.innerText = '0 productos';
+                    renderPieChart({});
                     return;
                 }
 
-                let html = '';
-                let lowStockHtml = '';
-                let lowStockCount = 0;
+                let html = '', lowStockHtml = '', lowStockCount = 0;
+                let catCounts = {};
 
                 querySnapshot.forEach((docSnap) => {
-                    const p = docSnap.data();
-                    const id = docSnap.id;
-                    const isLowStock = p.stock <= 6;
-                    const isActive = p.active !== false;
+                    const p = docSnap.data(), id = docSnap.id, isLowStock = p.stock <= 6, isActive = p.active !== false;
+
+                    catCounts[p.categoria] = (catCounts[p.categoria] || 0) + 1;
 
                     if (isLowStock) {
                         lowStockCount++;
@@ -461,71 +456,68 @@
                             <div class="p-3 bg-white border border-rose-200 rounded-xl flex items-center justify-between shadow-sm">
                                 <div class="flex items-center gap-3">
                                     <img src="${p.imagen}" class="w-8 h-8 rounded-lg object-cover">
-                                    <div>
-                                        <p class="text-xs font-bold text-slate-800">${p.titulo}</p>
-                                        <p class="text-[10px] text-slate-400">N° ${p.numero_parte}</p>
-                                    </div>
+                                    <div><p class="text-xs font-bold text-slate-800">${p.titulo}</p><p class="text-[10px] text-slate-400">N° ${p.numero_parte}</p></div>
                                 </div>
                                 <span class="text-xs font-black text-rose-500 bg-rose-100 px-2 py-1 rounded-lg">${p.stock} uds</span>
                             </div>
                         `;
                     }
-
                     html += `
                         <tr class="border-b border-gray-100 hover:bg-slate-50 ${!isActive ? 'opacity-60 bg-slate-50' : ''}">
                             <td class="py-3"><img src="${p.imagen}" class="w-10 h-10 rounded-lg object-cover"></td>
                             <td class="py-3 font-bold">${p.titulo}<br><span class="text-xs font-normal text-slate-400">N° ${p.numero_parte}</span></td>
                             <td class="py-3 text-xs">${p.categoria}</td>
-                            <td class="py-3">
-                                <div class="flex items-center gap-1">
-                                    <span class="text-xs font-bold">$</span>
-                                    <input type="number" step="0.01" value="${p.precio_ref}" id="price-${id}" class="w-16 p-1 border rounded text-xs font-bold">
-                                </div>
-                            </td>
-                            <td class="py-3">
-                                <div class="flex items-center gap-1">
-                                    <input type="number" value="${p.stock}" id="stock-${id}" class="w-14 p-1 border rounded text-xs font-bold ${isLowStock ? 'text-rose-600 font-extrabold border-rose-300' : ''}">
-                                    <button onclick="updateStockAndPrice('${id}')" class="px-2 py-1 bg-sky-500 text-white rounded text-[10px] font-bold">Guardar</button>
-                                </div>
-                            </td>
-                            <td class="py-3">
-                                ${isActive ? (isLowStock ? '<span class="px-2 py-1 rounded-full text-[10px] font-bold bg-rose-100 text-rose-600 border border-rose-200">⚠️ Stock Bajo</span>' : '<span class="px-2 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-600 border border-emerald-200">🟢 Activo</span>') : '<span class="px-2 py-1 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600 border border-slate-300">⏸️ Pausado</span>'}
-                            </td>
-                            <td class="py-3">
-                                <div class="flex items-center gap-2">
-                                    <button onclick="toggleProductState('${id}', ${isActive})" class="px-2.5 py-1 rounded-lg text-xs font-bold ${isActive ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}">
-                                        ${isActive ? 'Apagar' : 'Encender'}
-                                    </button>
-                                    <button onclick="deleteProduct('${id}')" class="text-xs font-bold text-rose-500 hover:underline">Eliminar</button>
-                                </div>
-                            </td>
+                            <td class="py-3"><div class="flex items-center gap-1"><span class="text-xs font-bold">$</span><input type="number" step="0.01" value="${p.precio_ref}" id="price-${id}" class="w-16 p-1 border rounded text-xs font-bold"></div></td>
+                            <td class="py-3"><div class="flex items-center gap-1"><input type="number" value="${p.stock}" id="stock-${id}" class="w-14 p-1 border rounded text-xs font-bold ${isLowStock ? 'text-rose-600 border-rose-300' : ''}"><button onclick="updateStockAndPrice('${id}')" class="px-2 py-1 bg-sky-500 text-white rounded text-[10px] font-bold">Guardar</button></div></td>
+                            <td class="py-3">${isActive ? (isLowStock ? '<span class="px-2 py-1 rounded-full text-[10px] font-bold bg-rose-100 text-rose-600 border border-rose-200">⚠️ Stock Bajo</span>' : '<span class="px-2 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-600 border border-emerald-200">🟢 Activo</span>') : '<span class="px-2 py-1 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600 border border-slate-300">⏸️ Pausado</span>'}</td>
+                            <td class="py-3"><div class="flex items-center gap-2"><button onclick="toggleProductState('${id}', ${isActive})" class="px-2.5 py-1 rounded-lg text-xs font-bold ${isActive ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}">${isActive ? 'Apagar' : 'Encender'}</button><button onclick="deleteProduct('${id}')" class="text-xs font-bold text-rose-500 hover:underline">Eliminar</button></div></td>
                         </tr>
                     `;
                 });
-
                 tbody.innerHTML = html;
                 dashBadge.innerText = `${lowStockCount} producto(s)`;
-                dashList.innerHTML = lowStockCount > 0 ? lowStockHtml : '<p class="text-xs text-emerald-600 font-semibold col-span-3">🎉 ¡Excelente! No hay productos con stock bajo.</p>';
+                dashList.innerHTML = lowStockCount > 0 ? lowStockHtml : '<p class="text-xs text-emerald-600 font-semibold col-span-3">🎉 ¡No hay productos con stock bajo!</p>';
+                renderPieChart(catCounts);
             });
         };
 
-        // CARGAR PEDIDOS / COMPRAS Y DESPACHO EN TIEMPO REAL
+        // RENDERIZAR GRÁFICO TIPO PASTEL
+        function renderPieChart(catData) {
+            const labels = Object.keys(catData);
+            const series = Object.values(catData);
+
+            const options = {
+                series: series.length > 0 ? series : [1],
+                labels: labels.length > 0 ? labels : ['Sin datos'],
+                chart: { type: 'pie', height: 320 },
+                legend: { position: 'bottom' },
+                colors: ['#0C3B7C', '#00A8E8', '#3B82F6', '#10B981', '#F59E0B', '#EF4444']
+            };
+
+            if (pieChartInstance) pieChartInstance.destroy();
+            pieChartInstance = new ApexCharts(document.querySelector("#pie-chart"), options);
+            pieChartInstance.render();
+        }
+
+        // PEDIDOS, DESPACHO Y GRÁFICO DE VELAS DINÁMICO
         window.loadOrders = function() {
-            const container = document.getElementById('orders-container');
+            const activeContainer = document.getElementById('active-orders-container');
+            const historyContainer = document.getElementById('history-orders-container');
             const totalPedidosEl = document.getElementById('dash-total-pedidos');
             const totalVentasEl = document.getElementById('dash-total-ventas');
 
             onSnapshot(collection(db, "orders"), (snapshot) => {
                 if (snapshot.empty) {
-                    container.innerHTML = '<div class="soft-card p-8 text-center text-slate-400 text-sm">No hay pedidos registrados en la tienda.</div>';
-                    totalPedidosEl.innerText = "0";
-                    totalVentasEl.innerText = "$0.00 REF";
+                    activeContainer.innerHTML = '<div class="soft-card p-8 text-center text-slate-400 text-sm">No hay pedidos registrados.</div>';
+                    historyContainer.innerHTML = '<div class="soft-card p-8 text-center text-slate-400 text-sm">Sin historial de entregas.</div>';
+                    totalPedidosEl.innerText = "0"; totalVentasEl.innerText = "$0.00 REF";
+                    renderCandleChart([]);
                     return;
                 }
 
-                let html = '';
-                let totalOrders = 0;
-                let totalVentas = 0;
+                let activeHtml = '', historyHtml = '';
+                let totalOrders = 0, totalVentas = 0;
+                let dailySales = {};
 
                 snapshot.forEach(docSnap => {
                     const order = docSnap.data();
@@ -533,27 +525,33 @@
                     totalOrders++;
                     totalVentas += order.total_ref || 0;
 
-                    const statusColors = {
-                        "En Proceso": "bg-amber-100 text-amber-700 border-amber-200",
-                        "Enviado": "bg-sky-100 text-sky-700 border-sky-200",
-                        "Entregado": "bg-emerald-100 text-emerald-700 border-emerald-200",
-                        "Listo para Recogida en Tienda": "bg-purple-100 text-purple-700 border-purple-200"
-                    };
+                    const isDelivered = order.estatus === "Entregado";
 
-                    html += `
+                    // Formatear fecha para el gráfico de velas
+                    const orderDate = order.created_at ? new Date(order.created_at.seconds * 1000) : new Date();
+                    const dayKey = orderDate.toISOString().split('T')[0];
+                    dailySales[dayKey] = (dailySales[dayKey] || 0) + (order.total_ref || 0);
+
+                    const cardHtml = `
                         <div class="soft-card p-6 space-y-4">
-                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b pb-4">
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b pb-4">
                                 <div>
-                                    <span class="text-[10px] font-bold text-slate-400">TRACKING: ${order.tracking}</span>
                                     <h3 class="text-base font-extrabold text-blue-900">${order.cliente} (C.I: ${order.cedula})</h3>
                                     <p class="text-xs text-slate-500">Correo: ${order.correo} | Tel: ${order.telefono} / Sec: ${order.telefono_secundario}</p>
                                 </div>
-                                <div class="flex items-center gap-3">
-                                    <select onchange="updateOrderStatus('${orderId}', this.value)" class="p-2 rounded-xl text-xs font-bold border outline-none ${statusColors[order.estatus] || 'bg-slate-100'}">
+                                <div class="flex items-center gap-2">
+                                    <div class="flex flex-col text-right">
+                                        <label class="text-[10px] font-bold text-slate-400">GUÍA / TRACKING ZOOM:</label>
+                                        <div class="flex items-center gap-1">
+                                            <input type="text" value="${order.tracking || ''}" id="tracking-${orderId}" class="p-1.5 border rounded-lg text-xs font-bold w-36 outline-none bg-white">
+                                            <button onclick="saveTrackingGuide('${orderId}')" class="px-2 py-1.5 bg-sky-500 text-white rounded-lg text-xs font-bold">Guardar</button>
+                                        </div>
+                                    </div>
+                                    <select onchange="updateOrderStatus('${orderId}', this.value)" class="p-2 rounded-xl text-xs font-bold border outline-none ${isDelivered ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
                                         <option value="En Proceso" ${order.estatus === 'En Proceso' ? 'selected' : ''}>En Proceso</option>
                                         <option value="Enviado" ${order.estatus === 'Enviado' ? 'selected' : ''}>Enviado (ZOOM)</option>
                                         <option value="Listo para Recogida en Tienda" ${order.estatus === 'Listo para Recogida en Tienda' ? 'selected' : ''}>Listo para Recogida</option>
-                                        <option value="Entregado" ${order.estatus === 'Entregado' ? 'selected' : ''}>Entregado</option>
+                                        <option value="Entregado" ${order.estatus === 'Entregado' ? 'selected' : ''}>Entregado (Mover a Historial)</option>
                                     </select>
                                     <button onclick="deleteOrder('${orderId}')" class="text-xs font-bold text-rose-500 hover:underline">Eliminar</button>
                                 </div>
@@ -571,70 +569,92 @@
                                     <p class="text-sky-600 font-extrabold text-sm">$${order.total_ref.toFixed(2)} REF (${order.total_bs.toLocaleString('es-VE')} Bs)</p>
                                 </div>
                                 <div>
-                                    <p class="font-bold text-slate-700 mb-1">Comprobante de Pago:</p>
-                                    ${order.comprobante ? `<a href="${order.comprobante}" target="_blank" class="inline-block"><img src="${order.comprobante}" class="h-16 w-16 object-cover rounded-lg border shadow hover:scale-105 transition"></a>` : '<span class="text-slate-400">Sin comprobante</span>'}
+                                    <p class="font-bold text-slate-700 mb-1">Comprobante Adjunto:</p>
+                                    ${order.comprobante ? `<a href="${order.comprobante}" target="_blank"><img src="${order.comprobante}" class="h-16 w-16 object-cover rounded-lg border shadow hover:scale-105 transition"></a>` : '<span class="text-slate-400">Sin comprobante</span>'}
                                 </div>
                             </div>
 
                             <div>
                                 <p class="text-xs font-bold text-slate-700 mb-2">Productos Solicitados:</p>
                                 <div class="flex flex-wrap gap-2">
-                                    ${order.productos.map(p => `
-                                        <span class="px-3 py-1 bg-sky-50 border border-sky-100 rounded-lg text-xs font-semibold text-sky-900">
-                                            ${p.titulo} (x${p.qty}) - $${(p.precio * p.qty).toFixed(2)}
-                                        </span>
-                                    `).join('')}
+                                    ${order.productos.map(p => `<span class="px-3 py-1 bg-sky-50 border border-sky-100 rounded-lg text-xs font-semibold text-sky-900">${p.titulo} (x${p.qty}) - $${(p.precio * p.qty).toFixed(2)}</span>`).join('')}
                                 </div>
                             </div>
                         </div>
                     `;
+
+                    if (isDelivered) { historyHtml += cardHtml; } else { activeHtml += cardHtml; }
                 });
 
-                container.innerHTML = html;
+                activeContainer.innerHTML = activeHtml || '<div class="soft-card p-6 text-center text-slate-400 text-sm">No hay despachos pendientes.</div>';
+                historyContainer.innerHTML = historyHtml || '<div class="soft-card p-6 text-center text-slate-400 text-sm">No hay órdenes en el historial.</div>';
                 totalPedidosEl.innerText = totalOrders;
                 totalVentasEl.innerText = `$${totalVentas.toFixed(2)} REF`;
+                renderCandleChart(dailySales);
             });
+        };
+
+        // RENDERIZAR GRÁFICO DE VELAS JAPONESAS
+        function renderCandleChart(salesMap) {
+            const keys = Object.keys(salesMap);
+            let candleData = keys.map(dateStr => {
+                const total = salesMap[dateStr];
+                return {
+                    x: new Date(dateStr),
+                    y: [total * 0.8, total * 1.2, total * 0.7, total] // [Open, High, Low, Close]
+                };
+            });
+
+            if (candleData.length === 0) {
+                candleData = [{ x: new Date(), y: [10, 20, 5, 15] }];
+            }
+
+            const options = {
+                series: [{ data: candleData }],
+                chart: { type: 'candlestick', height: 320, toolbar: { show: false } },
+                xaxis: { type: 'datetime' }
+            };
+
+            if (candleChartInstance) candleChartInstance.destroy();
+            candleChartInstance = new ApexCharts(document.querySelector("#candlestick-chart"), options);
+            candleChartInstance.render();
+        }
+
+        window.saveTrackingGuide = async function(orderId) {
+            const guideVal = document.getElementById(`tracking-${orderId}`).value;
+            try {
+                await updateDoc(doc(db, "orders", orderId), { tracking: guideVal });
+                showToast("¡Número de guía / tracking actualizado!");
+            } catch (e) { showToast("Error: " + e.message, true); }
         };
 
         window.updateOrderStatus = async function(orderId, newStatus) {
             try {
                 await updateDoc(doc(db, "orders", orderId), { estatus: newStatus });
-                showToast("¡Estatus del pedido actualizado con éxito!");
-            } catch (e) {
-                showToast("Error al actualizar estatus: " + e.message, true);
-            }
+                showToast("Estatus de orden actualizado.");
+            } catch (e) { showToast("Error: " + e.message, true); }
         };
 
         window.deleteOrder = async function(orderId) {
-            if (!confirm("¿Desea eliminar este pedido del historial?")) return;
-            try {
-                await deleteDoc(doc(db, "orders", orderId));
-                showToast("Pedido eliminado.");
-            } catch (e) { showToast("Error: " + e.message, true); }
+            if (!confirm("¿Desea eliminar esta orden?")) return;
+            try { await deleteDoc(doc(db, "orders", orderId)); showToast("Orden eliminada."); } catch (e) { showToast("Error", true); }
         };
 
         window.updateStockAndPrice = async function(id) {
             const newStock = parseInt(document.getElementById(`stock-${id}`).value);
             const newPrice = parseFloat(document.getElementById(`price-${id}`).value);
-            try {
-                await updateDoc(doc(db, "products", id), { stock: newStock, precio_ref: newPrice });
-                showToast("¡Stock y precio actualizados!");
-            } catch (e) { showToast("Error: " + e.message, true); }
+            try { await updateDoc(doc(db, "products", id), { stock: newStock, precio_ref: newPrice }); showToast("Actualizado."); } catch (e) { showToast("Error", true); }
         };
 
         window.toggleProductState = async function(id, currentState) {
-            try {
-                await updateDoc(doc(db, "products", id), { active: !currentState });
-                showToast(currentState ? "Producto pausado." : "Producto activado.");
-            } catch (e) { showToast("Error: " + e.message, true); }
+            try { await updateDoc(doc(db, "products", id), { active: !currentState }); showToast(currentState ? "Pausado." : "Activado."); } catch (e) { showToast("Error", true); }
         };
 
         window.deleteProduct = async function(id) {
-            if (!confirm("¿Desea eliminar este producto?")) return;
+            if (!confirm("¿Eliminar producto?")) return;
             try { await deleteDoc(doc(db, "products", id)); showToast("Eliminado."); } catch (e) { showToast("Error", true); }
         };
 
-        // Crear Usuarios
         window.handleCreateUser = async function(e) {
             e.preventDefault();
             const email = document.getElementById('new-user-email').value;
@@ -643,7 +663,7 @@
             try {
                 const userCred = await createUserWithEmailAndPassword(auth, email, pass);
                 await setDoc(doc(db, "users", userCred.user.uid), { email, role, created_at: new Date() });
-                showToast(`Usuario ${email} creado con éxito.`);
+                showToast(`Usuario ${email} (${role}) creado con éxito.`);
                 document.getElementById('new-user-email').value = '';
                 document.getElementById('new-user-pass').value = '';
             } catch (e) { showToast("Error: " + e.message, true); }
@@ -652,14 +672,10 @@
         function loadUsersList() {
             const tbody = document.getElementById('users-table-body');
             onSnapshot(collection(db, "users"), (querySnapshot) => {
-                if (querySnapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-slate-400">Sin usuarios.</td></tr>';
-                    return;
-                }
+                if (querySnapshot.empty) { tbody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-slate-400">Sin usuarios.</td></tr>'; return; }
                 let html = '';
                 querySnapshot.forEach((docSnap) => {
-                    const u = docSnap.data();
-                    const uid = docSnap.id;
+                    const u = docSnap.data(), uid = docSnap.id;
                     html += `
                         <tr class="border-b border-gray-100 hover:bg-slate-50">
                             <td class="p-3 font-bold text-slate-800">${u.email}</td>
@@ -677,14 +693,10 @@
             try { await deleteDoc(doc(db, "users", uid)); showToast("Eliminado."); } catch(e) { showToast("Error", true); }
         };
 
-        // Clientes
         function loadClientsList() {
             const tbody = document.getElementById('clients-table-body');
             onSnapshot(collection(db, "clients"), (snapshot) => {
-                if (snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-400">Sin clientes registrados.</td></tr>';
-                    return;
-                }
+                if (snapshot.empty) { tbody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-400">Sin clientes.</td></tr>'; return; }
                 let html = '';
                 snapshot.forEach(docSnap => {
                     const c = docSnap.data();
@@ -706,7 +718,7 @@
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
                 querySnapshot.forEach(async (d) => { await deleteDoc(doc(db, "products", d.id)); });
-                showToast("Base de datos de productos limpia.");
+                showToast("Base de datos limpia.");
             } catch (e) { showToast("Error", true); }
         };
 
@@ -717,9 +729,15 @@
             const errorDiv = document.getElementById('login-error');
             try {
                 errorDiv.innerText = "";
-                await signInWithEmailAndPassword(auth, email, pass);
+                const cred = await signInWithEmailAndPassword(auth, email, pass);
+                const userDoc = await getDoc(doc(db, "users", cred.user.uid));
+                
+                if (!userDoc.exists() || userDoc.data().role !== "admin") {
+                    await signOut(auth);
+                    errorDiv.innerText = "Acceso Denegado: Su cuenta de cliente no posee permisos administrativos.";
+                }
             } catch (err) {
-                errorDiv.innerText = "Error: Usuario o contraseña inválidos.";
+                errorDiv.innerText = "Error: Credenciales inválidas o no autorizadas.";
             }
         };
 
@@ -730,13 +748,21 @@
                 document.getElementById('login-screen').style.display = 'flex';
                 document.getElementById('app-container').style.display = 'none';
             } else {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('app-container').style.display = 'flex';
-                listenTasaGlobal();
-                loadInventory();
-                loadOrders();
-                loadClientsList();
-                loadUsersList();
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists() && userDoc.data().role === "admin") {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('app-container').style.display = 'flex';
+                    listenTasaGlobal();
+                    loadInventory();
+                    loadOrders();
+                    loadClientsList();
+                    loadUsersList();
+                } else {
+                    await signOut(auth);
+                    document.getElementById('login-screen').style.display = 'flex';
+                    document.getElementById('app-container').style.display = 'none';
+                    document.getElementById('login-error').innerText = "Acceso Denegado: Esta cuenta de cliente no posee permisos de administrador.";
+                }
             }
         });
     </script>
@@ -751,20 +777,6 @@
             });
             document.getElementById('nav-' + tabId).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-sky-500 bg-sky-50 transition";
         }
-
-        var optionsCandle = {
-            series: [{ data: [
-                { x: new Date(2026, 8, 20), y: [50, 70, 45, 65] },
-                { x: new Date(2026, 8, 21), y: [65, 80, 60, 75] },
-                { x: new Date(2026, 8, 22), y: [75, 90, 70, 85] },
-                { x: new Date(2026, 8, 23), y: [85, 95, 75, 90] }
-            ]}],
-            chart: { type: 'candlestick', height: 320, toolbar: { show: false } },
-            title: { text: 'Fluctuación de Ventas Diarias (REF)', align: 'left' },
-            xaxis: { type: 'datetime' }
-        };
-        var candleChart = new ApexCharts(document.querySelector("#candlestick-chart"), optionsCandle);
-        candleChart.render();
     </script>
 </body>
 </html>
